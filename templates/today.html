@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Сегодня{% endblock %}
+{% block content %}
+  <h1>Сегодня</h1>
+  <p>{{ student.full_name }}</p>
+  <p>Ближайших занятий и сроков пока нет.</p>
+  <a href="{% url 'request_new' %}">Заказать справку</a>
+{% endblock %}

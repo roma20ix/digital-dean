@@ -221,3 +221,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Локальная конфигурация и собранная статика
+.env.*
+!.env.example
+staticfiles/
+*.sqlite3-*
