@@ -1,0 +1,31 @@
+# Соглашение между сервером и интерфейсом
+
+Один сервер отрисовывает HTML. Этот файл определяет имена шаблонов, URL и поля, которые можно использовать параллельно. В URLconf используйте имена из столбца «Имя». Шаблоны строят ссылки через Django url или используют серверные detail_url/target_url. Для классов, форм и внутренней схемы БД имена можно выбирать свободно.
+
+| Страница | Метод, путь и имя | Шаблон | Контекст или действие |
+|---|---|---|---|
+| Вход | GET/POST /login/ · login | login.html | form с username и password; после входа — today |
+| Выход | POST /logout/ · logout | — | CSRF; завершить сессию и вернуть на login |
+| Сегодня | GET / · today | today.html | student, next_lesson (или None), next_deadline (или None), latest_request (или None), changes (список notice) |
+| Профиль | GET /profile/ · profile | profile.html | student из текущей сессии |
+| Расписание | GET /schedule/ · schedule | schedule.html | mode=day или week, date=YYYY-MM-DD (Москва), days, prev_url, next_url, next_teaching_url (или None); карточка занятия имеет якорь lesson-ID |
+| Учёба | GET /study/ · study | study.html | courses, exams; зачтено и отсутствие оценки — разные состояния |
+| Мои заявки и связь с деканатом | GET /requests/ · requests | requests/list.html | items (от новых к старым); в форме доступны справка и обращение в деканат |
+| Новая заявка | GET/POST /requests/new/ · request_new | requests/new.html | form с kind, message, submission_token; CSRF; после успеха redirect на request_detail, при ошибке — та же форма с введённым текстом |
+| Статус заявки | GET /requests/<int:pk>/ · request_detail | requests/detail.html | item, history; только владелец; недоступная запись — 404 |
+| Уведомления | GET /inbox/ · inbox | inbox.html | items типа notice (сначала свежие) |
+| Прочитано | POST /inbox/<int:pk>/read/ · notice_read | — | CSRF; меняет состояние уведомления только для текущего аккаунта |
+| Проверка доступности | GET /health/ · health | — | Короткий ответ, без конфигурации или персональных данных |
+
+### Поля
+
+- student: full_name, faculty, program, year, group_name.
+- lesson: id, subject, teacher, starts_at, ends_at, room, old_room (может быть пустым), old_starts_at (необязательно), detail_url. detail_url ведёт на нужную дату и #lesson-ID. На карточке явно указывается изменение в тексте.
+- days: список объектов с date, lessons. В режиме week передаётся неделя выбранной даты с днями без занятий. Переключение видов сохраняет выбранную дату. Если сегодня пусто, есть переход к ближайшему дню с занятиями.
+- deadline: title, due_at, target_url.
+- course: title, grade (число или None), credit_label (читаемый статус), assessment_type. exam: course_title, starts_at, room. Среднее оценок, если добавите, считается только по числовым выставленным оценкам с указанием шкалы.
+- item заявки: id, kind_label, status_label, created_at, detail_url, message. history: упорядоченный список записей с label и at. kind принимает certificate (справка об обучении) или appeal (обращение). Сообщение нужно только для обращения. Токен одной отправки связывается на сервере с владельцем и учитывается при повторном POST.
+- notice: id, category, title, body, created_at, source, is_read, target_url. category: announcement, deadline или change. Для переноса укажите, где было и где будет занятие, а target_url указывает на тот же lesson, что в расписании.
+- Безопасность: общие объявления можно брать из единого источника. Персональная подписка и флаг прочтения принадлежат текущему студенту. Для просмотра профиля используется текущий пользователь без внешнего параметра student_id.
+
+Дата «Сегодня» настоящая, Europe/Moscow. Для жюри создайте расписание как минимум на весь период до 28 ноября включительно. На выходной предусмотрите следующий учебный день. Демонстрационный перенос сохраните доступным в недельном расписании даже после его даты, а в материалах укажите соответствующий день.
