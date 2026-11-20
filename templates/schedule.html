@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Расписание{% endblock %}
+{% block content %}
+  <h1>Расписание</h1>
+  <p><a href="?mode=day&amp;date={{ date }}">День</a> · <a href="?mode=week&amp;date={{ date }}">Неделя</a></p>
+  <ul>{% for day in days %}<li>{{ day.date|date:"j E Y" }} — занятий пока нет.</li>{% endfor %}</ul>
+  <a href="{{ prev_url }}">Назад</a> · <a href="{{ next_url }}">Вперёд</a>
+{% endblock %}

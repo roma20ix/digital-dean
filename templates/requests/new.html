@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Новая заявка{% endblock %}
+{% block content %}
+  <h1>Новая заявка</h1>
+  <p>Приём заявок ещё не открыт.</p>
+  <form method="post">
+    {% csrf_token %}
+    <fieldset disabled><legend>Данные заявки</legend>{{ form.as_p }}</fieldset>
+  </form>
+{% endblock %}

@@ -1,0 +1,10 @@
+:root { font: 100%/1.5 system-ui, sans-serif; color: #172c38; }
+body { max-width: 48rem; margin: auto; padding: 1rem; overflow-wrap: anywhere; }
+header, footer { padding: 1rem 0; }
+main { border-block: 1px solid #bac6cc; padding-block: 1rem 2rem; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin-top: .5rem; }
+a { color: #145987; }
+input, textarea, select, button { font: inherit; max-width: 100%; box-sizing: border-box; }
+label { display: block; }
+fieldset { min-width: 0; }
+:focus-visible { outline: 3px solid #007293; outline-offset: 2px; }

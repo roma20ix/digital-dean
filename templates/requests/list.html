@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Мои заявки{% endblock %}
+{% block content %}
+  <h1>Мои заявки</h1>
+  <p>Заявок пока нет.</p>
+  <a href="{% url 'request_new' %}">Справка или обращение</a>
+{% endblock %}
