@@ -1,6 +1,7 @@
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 
 from django.contrib.auth.decorators import login_not_required
+from django.db.models import F, Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -9,7 +10,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from .forms import RequestForm
-from .models import StudentProfile, StudentRequest
+from .models import CourseResult, Exam, Lesson, Notice, StudentProfile, StudentRequest
 
 
 @login_not_required
@@ -26,13 +27,29 @@ def student_context(user):
             "faculty": "", "program": "", "year": None, "group_name": ""}
 
 
+def student_lessons(user):
+    group = StudentProfile.objects.filter(user=user).values("group_name")
+    return Lesson.objects.filter(group_name__in=group)
+
+
+def student_notices(user, now):
+    return Notice.objects.filter(
+        Q(lesson__isnull=True) | Q(lesson__group_name=F("recipient__group_name")),
+        recipient__user=user, created_at__lte=now,
+    ).select_related("lesson")
+
+
 @never_cache
 @require_GET
 def today(request):
+    now = timezone.now()
+    notices = student_notices(request.user, now)
     return render(request, "today.html", {
-        "student": student_context(request.user), "next_lesson": None,
-        "next_deadline": None, "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
-        "changes": [],
+        "student": student_context(request.user),
+        "next_lesson": student_lessons(request.user).filter(ends_at__gt=now).first(),
+        "next_deadline": notices.filter(category=Notice.Category.DEADLINE, due_at__gte=now).order_by("due_at", "pk").first(),
+        "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
+        "changes": notices.filter(category=Notice.Category.CHANGE),
     })
 
 
@@ -55,21 +72,35 @@ def schedule(request):
         selected = timezone.localdate()
     length = 7 if mode == "week" else 1
     start = selected - timedelta(days=selected.weekday()) if mode == "week" else selected
-    days = [{"date": start + timedelta(days=i), "lessons": []} for i in range(length)]
+    by_date = {start + timedelta(days=i): [] for i in range(length)}
+    lessons = student_lessons(request.user)
+    lower = timezone.make_aware(datetime.combine(start, time.min))
+    upper = lower + timedelta(days=length)
+    for lesson in lessons.filter(starts_at__gte=lower, starts_at__lt=upper):
+        by_date[timezone.localdate(lesson.starts_at)].append(lesson)
+    days = [{"date": day, "lessons": entries} for day, entries in by_date.items()]
+    next_teaching_url = None
+    if not by_date[selected]:
+        tomorrow = timezone.make_aware(datetime.combine(selected + timedelta(days=1), time.min))
+        following = lessons.filter(starts_at__gte=tomorrow).first()
+        if following:
+            next_teaching_url = following.detail_url
 
     def link(offset):
         return reverse("schedule", query={"date": selected + timedelta(days=offset), "mode": mode})
 
     return render(request, "schedule.html", {
         "mode": mode, "date": selected.isoformat(), "days": days,
-        "prev_url": link(-length), "next_url": link(length), "next_teaching_url": None,
+        "prev_url": link(-length), "next_url": link(length), "next_teaching_url": next_teaching_url,
     })
 
 
 @never_cache
 @require_GET
 def study(request):
-    return render(request, "study.html", {"courses": [], "exams": []})
+    courses = CourseResult.objects.filter(student__user=request.user)
+    exams = Exam.objects.filter(course__in=courses, starts_at__gte=timezone.now()).select_related("course")
+    return render(request, "study.html", {"courses": courses, "exams": exams})
 
 
 @never_cache
@@ -104,10 +135,13 @@ def request_detail(request, pk):
 @never_cache
 @require_GET
 def inbox(request):
-    return render(request, "inbox.html", {"items": []})
+    return render(request, "inbox.html", {"items": student_notices(request.user, timezone.now())})
 
 
 @never_cache
 @require_POST
 def notice_read(request, pk):
-    return HttpResponse("Уведомление не найдено.", status=404, content_type="text/plain; charset=utf-8")
+    updated = student_notices(request.user, timezone.now()).filter(pk=pk).update(is_read=True)
+    if not updated:
+        return HttpResponse("Уведомление не найдено.", status=404, content_type="text/plain; charset=utf-8")
+    return redirect("inbox")

@@ -9,9 +9,11 @@ from django.utils import timezone
 
 from cabinet.models import StudentProfile, StudentRequest
 
+from ._academic_demo import seed_academics
+
 
 class Command(BaseCommand):
-    help = "Создать двух демостудентов и примеры заявок."
+    help = "Подготовить демостудентов, заявки, расписание, результаты учёбы и уведомления."
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -32,7 +34,7 @@ class Command(BaseCommand):
             if not user.check_password(password):
                 user.set_password(password)
                 user.save(update_fields=["password"])
-            StudentProfile.objects.update_or_create(user=user, defaults={
+            profile, _ = StudentProfile.objects.update_or_create(user=user, defaults={
                 "is_demo": True, "full_name": full_name, "faculty": faculty,
                 "program": program, "year": year, "group_name": group,
             })
@@ -48,4 +50,5 @@ class Command(BaseCommand):
                 owner=user, submission_token=uuid5(NAMESPACE_URL, f"digital-dean/demo/{username}"),
                 defaults={**example, "created_at": created_at},
             )
+            seed_academics(profile)
         self.stdout.write("Подготовлены демоаккаунты student_a и student_b.")
