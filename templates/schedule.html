@@ -1,8 +1,38 @@
 {% extends "base.html" %}
+{% load static %}
+{% block styles %}<link rel="stylesheet" href="{% static 'academic.css' %}">{% endblock %}
 {% block title %}Расписание{% endblock %}
 {% block content %}
+<div class="academic">
   <h1>Расписание</h1>
-  <p><a href="?mode=day&amp;date={{ date }}">День</a> · <a href="?mode=week&amp;date={{ date }}">Неделя</a></p>
-  <ul>{% for day in days %}<li>{{ day.date|date:"j E Y" }} — занятий пока нет.</li>{% endfor %}</ul>
-  <a href="{{ prev_url }}">Назад</a> · <a href="{{ next_url }}">Вперёд</a>
+  <div class="calendar-tools">
+    <div class="modes" role="group" aria-label="Вид расписания">
+      <a href="?mode=day&amp;date={{ date }}" {% if mode == "day" %}aria-current="page"{% endif %}>День</a>
+      <a href="?mode=week&amp;date={{ date }}" {% if mode == "week" %}aria-current="page"{% endif %}>Неделя</a>
+    </div>
+    <div class="paging">
+      <a href="{{ prev_url }}">← {% if mode == "week" %}Предыдущая неделя{% else %}Предыдущий день{% endif %}</a>
+      <a href="{{ next_url }}">{% if mode == "week" %}Следующая неделя{% else %}Следующий день{% endif %} →</a>
+    </div>
+  </div>
+  {% for day in days %}
+    <section class="day">
+      <h2>{{ day.date|date:"l, j E" }}</h2>
+      {% for lesson in day.lessons %}
+        <article class="period" id="lesson-{{ lesson.id }}" tabindex="-1" aria-labelledby="subject-{{ lesson.id }}">
+          <div class="time">{{ lesson.starts_at|date:"H:i" }} – {{ lesson.ends_at|date:"H:i" }}</div>
+          <div>
+            <h3 id="subject-{{ lesson.id }}">{{ lesson.subject }}</h3>
+            <p>{{ lesson.teacher }}</p>
+            {% if lesson.old_starts_at %}<p>Прежнее начало — {{ lesson.old_starts_at|date:"j E, H:i" }}</p>{% endif %}
+            {% if lesson.old_room %}
+              <p class="relocated"><strong>Новая аудитория — {{ lesson.room }}</strong><br>Прежняя аудитория — {{ lesson.old_room }}</p>
+            {% else %}<p>Аудитория {{ lesson.room }}</p>{% endif %}
+          </div>
+        </article>
+      {% empty %}<p>Занятий нет.</p>{% endfor %}
+    </section>
+  {% endfor %}
+  {% if next_teaching_url %}<a href="{{ next_teaching_url }}">Ближайший учебный день с занятиями</a>{% endif %}
+</div>
 {% endblock %}
