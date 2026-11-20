@@ -1,6 +1,29 @@
 {% extends "base.html" %}
+{% load static %}
+{% block styles %}<link rel="stylesheet" href="{% static 'academic.css' %}">{% endblock %}
 {% block title %}Учёба{% endblock %}
 {% block content %}
+<div class="academic">
   <h1>Учёба</h1>
-  <p>Оценок и экзаменов пока нет.</p>
+  <section class="panel">
+    <h2>Оценки и зачёты</h2>
+    {% for course in courses %}
+      <div class="result">
+        <h3>{{ course.title }}</h3>
+        <div>{% if course.grade != None %}
+          <strong>{{ course.grade }}</strong>{% if course.grade == 2 %} · Неудовлетворительно{% endif %}
+        {% elif course.assessment_type == "Зачёт" %}{{ course.credit_label }}
+        {% else %}Оценки пока нет{% endif %}</div>
+      </div>
+    {% empty %}<p>Результатов пока нет.</p>{% endfor %}
+  </section>
+  <section class="panel">
+    <h2>Сессия</h2>
+    {% for exam in exams %}
+      <div class="result"><h3>{{ exam.course_title }}</h3>
+        <div>{{ exam.starts_at|date:"j E Y, H:i" }}<br>Аудитория {{ exam.room }}</div>
+      </div>
+    {% empty %}<p>Предстоящих экзаменов пока нет.</p>{% endfor %}
+  </section>
+</div>
 {% endblock %}

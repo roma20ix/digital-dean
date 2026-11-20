@@ -1,6 +1,21 @@
 {% extends "base.html" %}
+{% load static %}
+{% block styles %}<link rel="stylesheet" href="{% static 'academic.css' %}">{% endblock %}
 {% block title %}Уведомления{% endblock %}
 {% block content %}
+<div class="academic">
   <h1>Уведомления</h1>
-  <p>Новых сообщений пока нет.</p>
+  {% url 'inbox' as inbox_url %}
+  {% for notice in items %}
+    <article class="panel notice">
+      <div class="metadata">{% if notice.category == "change" %}Изменение расписания{% elif notice.category == "deadline" %}Срок{% else %}Объявление{% endif %} · {% if notice.is_read %}Прочитано{% else %}<strong>Новое</strong>{% endif %}</div>
+      <h2>{% if notice.target_url and notice.target_url != inbox_url %}<a href="{{ notice.target_url }}">{{ notice.title }}</a>{% else %}{{ notice.title }}{% endif %}</h2>
+      <p>{{ notice.body|linebreaksbr }}</p>
+      <p class="metadata">{{ notice.created_at|date:"j E Y, H:i" }} · {{ notice.source }}</p>
+      {% if not notice.is_read %}
+        <form action="{% url 'notice_read' notice.id %}" method="post">{% csrf_token %}<button>Отметить прочитанным</button></form>
+      {% endif %}
+    </article>
+  {% empty %}<p>Уведомлений пока нет.</p>{% endfor %}
+</div>
 {% endblock %}
