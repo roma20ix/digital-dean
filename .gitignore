@@ -227,3 +227,4 @@ __marimo__/
 !.env.example
 staticfiles/
 *.sqlite3-*
+.test-cabinet-*.sqlite3

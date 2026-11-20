@@ -48,7 +48,7 @@ class FoundationTests(TestCase):
         client.get("/requests/new/")
         csrf = {"csrfmiddlewaretoken": client.cookies["csrftoken"].value}
         self.assertEqual(client.post("/inbox/1/read/", csrf).status_code, 404)
-        self.assertContains(client.post("/requests/new/", csrf), "Приём заявок ещё не открыт")
+        self.assertIn("submission_token", client.post("/requests/new/", csrf).context["form"].errors)
 
     def test_empty_week(self):
         self.client.force_login(self.user)
