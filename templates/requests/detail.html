@@ -1,6 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Заявка не найдена{% endblock %}
+{% block title %}{% if item %}Заявка № {{ item.id }}{% else %}Заявка не найдена{% endif %}{% endblock %}
 {% block content %}
+<a href="{% url 'requests' %}">← Мои заявки</a>
+{% if item %}
+  <h1>Заявка № {{ item.id }}</h1>
+  <p class="byline">{{ item.kind_label }} · {{ item.created_at|date:"j E Y, H:i" }}</p>
+  <section class="card status">
+    <p>Статус заявки</p><h2>{{ item.status_label }}</h2>
+    {% if item.status_label == "Готова к выдаче" %}<p>Заберите справку в деканате.</p>
+    {% else %}<p>Проверяйте статус в разделе «Мои заявки».</p>{% endif %}
+  </section>
+  {% if item.message %}<section class="card"><h2>Текст обращения</h2>{{ item.message|linebreaksbr }}</section>{% endif %}
+  <section class="card"><h2>История заявки</h2><ol class="history">
+    {% for event in history %}<li><strong>{{ event.label }}</strong><p class="meta">{{ event.at|date:"j E Y, H:i" }}</p></li>{% endfor %}
+  </ol></section>
+{% else %}
   <h1>Заявка не найдена</h1>
-  <a href="{% url 'requests' %}">Мои заявки</a>
+{% endif %}
 {% endblock %}
