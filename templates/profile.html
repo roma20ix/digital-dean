@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Профиль{% endblock %}
 {% block content %}
-  <h1>Профиль</h1>
-  <p>{{ student.full_name }}</p>
-  <p>Сведения об обучении пока не заполнены.</p>
+<h1>Профиль</h1>
+<section class="card">
+  <h2>{{ student.full_name }}</h2>
+  <dl class="facts">
+    <dt>Факультет</dt><dd>{{ student.faculty|default:"Не указан" }}</dd>
+    <dt>Направление</dt><dd>{{ student.program|default:"Не указано" }}</dd>
+    <dt>Курс</dt><dd>{{ student.year|default:"Не указан" }}</dd>
+    <dt>Группа</dt><dd>{{ student.group_name|default:"Не указана" }}</dd>
+  </dl>
+</section>
 {% endblock %}
