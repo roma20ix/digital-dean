@@ -47,3 +47,5 @@ gunicorn config.wsgi:application --bind "0.0.0.0:${PORT}"
 ## Проверки
 
 `python manage.py test cabinet.tests.FoundationTests.test_public_health` проверяет публичный ответ отдельно. Полный набор запускается через `python manage.py test`. GitHub Actions проверяет конфигурацию, миграции и тесты на Linux и Windows. На Windows workflow также запускает сервер и запрашивает `/health/` из PowerShell.
+
+Источники зависимостей, лицензии и происхождение элементов интерфейса перечислены в [описании компонентов](docs/THIRD_PARTY.md).
