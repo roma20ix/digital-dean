@@ -1,15 +1,15 @@
 from datetime import date, timedelta
-from uuid import uuid4
 
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from .forms import RequestForm
+from .models import StudentProfile, StudentRequest
 
 
 @login_not_required
@@ -19,6 +19,9 @@ def health(request):
 
 
 def student_context(user):
+    profile = StudentProfile.objects.filter(user=user).first()
+    if profile is not None:
+        return profile
     return {"full_name": user.get_full_name() or user.get_username(),
             "faculty": "", "program": "", "year": None, "group_name": ""}
 
@@ -28,7 +31,8 @@ def student_context(user):
 def today(request):
     return render(request, "today.html", {
         "student": student_context(request.user), "next_lesson": None,
-        "next_deadline": None, "latest_request": None, "changes": [],
+        "next_deadline": None, "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
+        "changes": [],
     })
 
 
@@ -71,23 +75,30 @@ def study(request):
 @never_cache
 @require_GET
 def requests(request):
-    return render(request, "requests/list.html", {"items": []})
+    return render(request, "requests/list.html", {"items": StudentRequest.objects.filter(owner=request.user)})
 
 
 @never_cache
 @require_http_methods(["GET", "POST"])
 def request_new(request):
-    form = RequestForm(request.POST if request.method == "POST" else None,
-                       initial={"submission_token": uuid4()})
-    if request.method == "POST":
-        form.add_error(None, "Приём заявок ещё не открыт.")
+    form = RequestForm(request.POST if request.method == "POST" else None, user=request.user)
+    if form.is_bound and form.is_valid():
+        data = form.cleaned_data
+        item, _ = StudentRequest.objects.get_or_create(
+            owner=request.user, submission_token=data["submission_token"],
+            defaults={"kind": data["kind"], "message": data["message"]},
+        )
+        return redirect(item.detail_url)
     return render(request, "requests/new.html", {"form": form})
 
 
 @never_cache
 @require_GET
 def request_detail(request, pk):
-    return render(request, "requests/detail.html", {"item": None, "history": []}, status=404)
+    item = StudentRequest.objects.filter(owner=request.user, pk=pk).first()
+    if item is None:
+        return render(request, "requests/detail.html", {"item": None, "history": []}, status=404)
+    return render(request, "requests/detail.html", {"item": item, "history": item.history})
 
 
 @never_cache
