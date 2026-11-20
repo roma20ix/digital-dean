@@ -1,8 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Сегодня{% endblock %}
 {% block content %}
-  <h1>Сегодня</h1>
-  <p>{{ student.full_name }}</p>
-  <p>Ближайших занятий и сроков пока нет.</p>
-  <a href="{% url 'request_new' %}">Заказать справку</a>
+<div class="heading"><h1>Сегодня</h1><span>{% now "j E, l" %}</span></div>
+<p class="byline">{{ student.full_name }}</p>
+<div class="dashboard">
+  <section class="card lesson">
+    <h2 class="band">Ближайшая пара</h2>
+    {% if next_lesson %}
+      {% if next_lesson.old_room %}
+        <div class="move">Смена аудитории <strong>Теперь {{ next_lesson.room }}</strong>Была {{ next_lesson.old_room }}</div>
+      {% endif %}
+      <div class="pad">
+        <p>{{ next_lesson.starts_at|date:"j E, H:i" }} — {{ next_lesson.ends_at|date:"H:i" }}</p>
+        {% if next_lesson.old_starts_at %}<p>Прежнее начало — {{ next_lesson.old_starts_at|date:"j E, H:i" }}</p>{% endif %}
+        <h3><a href="{{ next_lesson.detail_url }}">{{ next_lesson.subject }}</a></h3>
+        <p>{{ next_lesson.teacher }}</p>
+        {% if not next_lesson.old_room %}<p>Аудитория {{ next_lesson.room }}</p>{% endif %}
+      </div>
+    {% else %}<p class="pad">Ближайших занятий пока нет.</p>{% endif %}
+  </section>
+  <section class="card requests">
+    <h2>Мои заявки</h2>
+    <a class="primary" href="{% url 'request_new' %}">Заказать справку</a>
+    {% if latest_request %}
+      <p class="ruled">Последняя заявка</p>
+      <a href="{{ latest_request.detail_url }}">{{ latest_request.kind_label }} № {{ latest_request.id }}</a>
+      <p class="meta">{{ latest_request.status_label }} · {{ latest_request.created_at|date:"j E Y" }}</p>
+    {% else %}<p class="meta">Заявок пока нет.</p>{% endif %}
+  </section>
+  <section class="card">
+    <h2>Ближайший срок</h2>
+    {% if next_deadline %}<a href="{{ next_deadline.target_url }}">{{ next_deadline.title }}</a><p>{{ next_deadline.due_at|date:"j E, H:i" }}</p>
+    {% else %}<p>Ближайших сроков пока нет.</p>{% endif %}
+  </section>
+  {% if changes %}
+    <section class="card"><h2>Изменения</h2>
+      {% for notice in changes %}<div class="entry"><a href="{{ notice.target_url }}">{{ notice.title }}</a><p>{{ notice.body }}</p></div>{% endfor %}
+    </section>
+  {% endif %}
+</div>
 {% endblock %}

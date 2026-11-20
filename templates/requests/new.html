@@ -1,10 +1,22 @@
 {% extends "base.html" %}
 {% block title %}Новая заявка{% endblock %}
 {% block content %}
+<div class="narrow">
+  <a href="{% url 'requests' %}">← Мои заявки</a>
   <h1>Новая заявка</h1>
-  <p>Приём заявок ещё не открыт.</p>
-  <form method="post">
+  <form class="card stack" method="post" action="{% url 'request_new' %}">
     {% csrf_token %}
-    <fieldset disabled><legend>Данные заявки</legend>{{ form.as_p }}</fieldset>
+    {{ form.non_field_errors }}
+    {% for field in form.hidden_fields %}
+      {{ field }}
+      {% if field.errors %}{{ field.errors }}<a href="{% url 'request_new' %}">Открыть новую форму</a>{% endif %}
+    {% endfor %}
+    <div>{{ form.kind.label_tag }}{{ form.kind }}{{ form.kind.errors }}</div>
+    <div>{{ form.message.label_tag }}
+      <p class="hint" id="{{ form.message.auto_id }}_helptext">Для справки это поле можно оставить пустым.</p>
+      {{ form.message }}{{ form.message.errors }}
+    </div>
+    <button class="primary">Отправить заявку</button>
   </form>
+</div>
 {% endblock %}

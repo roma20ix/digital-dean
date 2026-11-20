@@ -8,21 +8,25 @@
   <link rel="stylesheet" href="{% static 'cabinet.css' %}">
 </head>
 <body>
-  <header>
-    <strong>Цифровой деканат</strong>
+  <a class="skip" href="#main">Перейти к содержанию</a>
+  <header class="mast"><div class="wrap mast-inner">
+    <strong class="brand">Цифровой деканат</strong>
     {% if user.is_authenticated %}
-      <nav aria-label="Разделы кабинета">
-        <a href="{% url 'today' %}">Сегодня</a>
-        <a href="{% url 'schedule' %}">Расписание</a>
-        <a href="{% url 'study' %}">Учёба</a>
-        <a href="{% url 'requests' %}">Мои заявки</a>
-        <a href="{% url 'inbox' %}">Уведомления</a>
-        <a href="{% url 'profile' %}">Профиль</a>
-        <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button>Выйти</button></form>
-      </nav>
+      <details class="menu">
+        <summary>Меню</summary>
+        <nav aria-label="Разделы кабинета">
+          <a href="{% url 'today' %}">Сегодня</a>
+          <a href="{% url 'schedule' %}">Расписание</a>
+          <a href="{% url 'study' %}">Учёба</a>
+          <a href="{% url 'requests' %}">Мои заявки</a>
+          <a href="{% url 'inbox' %}">Уведомления</a>
+          <a href="{% url 'profile' %}">Профиль</a>
+          <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout">Выйти</button></form>
+        </nav>
+      </details>
     {% endif %}
-  </header>
-  <main>{% block content %}{% endblock %}</main>
-  <footer>Конкурсный прототип · вымышленные данные</footer>
+  </div></header>
+  <main class="wrap" id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+  <footer class="wrap">Конкурсный прототип · вымышленные данные</footer>
 </body>
 </html>
