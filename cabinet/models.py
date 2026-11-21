@@ -212,6 +212,10 @@ class CourseWeek(models.Model):
 
 
 class CourseTask(models.Model):
+    class Kind(models.TextChoices):
+        HOMEWORK = "homework", "Домашнее задание"
+        EXAM_REGISTRATION = "exam_signup", "Запись на экзамен"
+
     class Status(models.TextChoices):
         ASSIGNED = "assigned", "Задано"
         STARTED = "started", "В работе"
@@ -222,6 +226,7 @@ class CourseTask(models.Model):
     OPEN = (Status.ASSIGNED, Status.STARTED, Status.DRAFT)
     week = models.ForeignKey(CourseWeek, on_delete=models.CASCADE, related_name="tasks")
     notice = models.OneToOneField(Notice, on_delete=models.CASCADE, related_name="work")
+    kind = models.CharField(max_length=16, choices=Kind.choices, default=Kind.HOMEWORK)
     instructions = models.TextField()
     status = models.CharField(max_length=12, choices=Status.choices, default=Status.ASSIGNED)
     answer = models.TextField(blank=True)

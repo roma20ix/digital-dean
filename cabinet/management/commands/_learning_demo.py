@@ -37,6 +37,7 @@ def seed_learning(student, subject, pending, credit, workshops, task_title, publ
         "material": "Проверьте время и аудиторию в ведомости. Затем отправьте подтверждение участия.",
     })
     status = CourseTask.Status
+    exam_signup = f"Подтвердить запись на экзамен «{pending}»"
     examples = [
         (weeks[0], task_title, None, status.ASSIGNED,
          "Найдите сумму (3, 2) и (−1, 4). Покажите вычисление каждой координаты." if math else
@@ -47,7 +48,7 @@ def seed_learning(student, subject, pending, credit, workshops, task_title, publ
          "Примените метод из материала второй недели к собственному примеру. Запишите исходные данные и результат."),
         (weeks[1], "Сравнение двух решений" if math else "Хронология сделки", 19, status.REVIEW,
          "Предложите два способа проверить вывод по теме недели."),
-        (exam_week, f"Подтвердить запись на экзамен «{pending}»", None, status.ASSIGNED,
+        (exam_week, exam_signup, None, status.ASSIGNED,
          "Откройте ведомость, сверьте дату экзамена и подтвердите участие текстовым ответом."),
     ]
     for week, title, day, initial_status, instructions in examples:
@@ -59,6 +60,8 @@ def seed_learning(student, subject, pending, credit, workshops, task_title, publ
                 "source": "Учебная часть", "text": "Откройте условие в курсе.", "due_at": at(date(2026, 11, day), 18),
             })
         defaults = {"week": week, "instructions": instructions, "status": initial_status}
+        if title == exam_signup:
+            defaults["kind"] = CourseTask.Kind.EXAM_REGISTRATION
         if initial_status in (status.GRADED, status.REVIEW):
             defaults.update(answer=week.material, submitted_at=notice.due_at)
         if initial_status == status.GRADED:

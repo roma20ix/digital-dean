@@ -2,7 +2,7 @@
 {% block title %}{{ task.notice.title }}{% endblock %}
 {% block learning_content %}
 <a class="back" href="{% url 'course_detail' course.pk %}#week-{{ task.week_id }}">← {{ course.title }}</a>
-<p class="meta">Домашнее задание · Неделя {{ task.week.number }}</p>
+<p class="meta">{{ task.get_kind_display }} · Неделя {{ task.week.number }}</p>
 <h1>{{ task.notice.title }}</h1>
 {% if error %}<p class="errorlist" role="alert">{{ error }}</p>{% endif %}
 <div class="course-layout"><div>

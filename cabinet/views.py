@@ -64,12 +64,16 @@ def today(request):
     lessons = student_lessons(request.user)
     local_day = timezone.localdate(now)
     start = timezone.make_aware(datetime.combine(local_day, time.min))
+    next_deadline = (
+        notices.filter(Q(work__isnull=True) | Q(work__status__in=CourseTask.OPEN),
+                       category=Notice.Category.DEADLINE, due_at__gte=now)
+        .select_related("work__week__course").order_by("due_at", "pk").first()
+    )
     return render(request, "today.html", {
         "today_lessons": lessons.filter(starts_at__gte=start, starts_at__lt=start + timedelta(days=1)),
         "student": student_context(request.user),
         "next_lesson": lessons.filter(ends_at__gt=now).first(),
-        "next_deadline": notices.filter(Q(work__isnull=True) | Q(work__status__in=CourseTask.OPEN),
-                                       category=Notice.Category.DEADLINE, due_at__gte=now).order_by("due_at", "pk").first(),
+        "next_deadline": next_deadline,
         "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
         "changes": notices.filter(category=Notice.Category.CHANGE),
     })

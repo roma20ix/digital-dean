@@ -59,6 +59,14 @@ class LearningTests(TestCase):
             catalog = self.client.get(reverse("course_catalog"), {"category": "elective"})
             self.assertEqual([c.category for c in catalog.context["courses"]], ["elective"])
 
+    def test_home_shows_exam_registration_when_it_is_due_next(self):
+        self.clock.return_value = NOW.replace(day=29)
+        home = self.client.get("/")
+        self.assertContains(home, "Запись на экзамен")
+        self.assertContains(home, "Подтвердить до 30 ноября, 18:00 МСК")
+        self.assertNotContains(home, "Ближайшее домашнее задание")
+        self.assertContains(self.client.get(home.context["next_deadline"].target_url), "Запись на экзамен · Неделя")
+
     def test_draft_submit_validation_and_reseed(self):
         task = self.client.get("/").context["next_deadline"].work
         url = task.detail_url
