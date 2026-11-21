@@ -54,7 +54,7 @@ class AcademicDemo(StaticLiveServerTestCase):
                     self.assertIn("date=2026-11-20#", page.url)
                     capture("day")
                     page.get_by_role("link", name="Неделя", exact=True).press("Enter")
-                    self.assertEqual(page.locator(".day").count(), 7)
+                    expect(page.locator(".day")).to_have_count(7)
                     capture("week")
                     page.goto(self.live_server_url + "/study/")
                     for text in ("Оценки пока нет", "Зачтено", "5", "Сессия", "2 декабря 2026, 10:00"):

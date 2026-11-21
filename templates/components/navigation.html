@@ -1,0 +1,13 @@
+{% with page=request.resolver_match.url_name %}
+<nav aria-label="Разделы кабинета">
+  <a href="{% url 'today' %}" {% if page == "today" %}aria-current="page"{% endif %} title="Сегодня" aria-label="Сегодня">{% include "components/icon.html" with name="today" %}<span>Сегодня</span></a>
+  <a href="{% url 'schedule' %}" {% if page == "schedule" %}aria-current="page"{% endif %} title="Расписание" aria-label="Расписание">{% include "components/icon.html" with name="schedule" %}<span>Расписание</span></a>
+  {% if not employee_account %}<a href="{% url 'study' %}" {% if page == "study" %}aria-current="page"{% endif %} title="Учёба" aria-label="Учёба">{% include "components/icon.html" with name="study" %}<span>Учёба</span></a>{% endif %}
+  {% if not employee_account %}<a href="{% url 'requests' %}" {% if page == "requests" or page == "request_detail" or page == "request_new" %}aria-current="location"{% endif %} title="Мои заявки" aria-label="Мои заявки">{% include "components/icon.html" with name="requests" %}<span>Мои заявки</span></a>{% endif %}
+  {% if not employee_account %}<a href="{% url 'inbox' %}" {% if page == "inbox" %}aria-current="page"{% endif %} title="Уведомления" aria-label="Уведомления">{% include "components/icon.html" with name="inbox" %}<span>Уведомления</span></a>{% endif %}
+  <a href="{% url 'profile' %}" {% if page == "profile" %}aria-current="page"{% endif %} title="Профиль" aria-label="Профиль">{% include "components/icon.html" with name="profile" %}<span>Профиль</span></a>
+  {% if not employee_account %}<a href="{% url 'attendance' %}" {% if page == "attendance" %}aria-current="page"{% endif %} title="Посещаемость" aria-label="Посещаемость">{% include "components/icon.html" with name="attendance" %}<span>Посещаемость</span></a>{% endif %}
+  <a href="{% url 'media' %}" {% if page == "media" %}aria-current="page"{% endif %} title="Медиацентр" aria-label="Медиацентр">{% include "components/icon.html" with name="media" %}<span>Медиацентр</span></a>
+  <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout" title="Выйти" aria-label="Выйти">{% include "components/icon.html" with name="logout" %}<span>Выйти</span></button></form>
+</nav>
+{% endwith %}

@@ -2,13 +2,39 @@
 {% block title %}Профиль{% endblock %}
 {% block content %}
 <h1>Профиль</h1>
+<div class="profile-grid">
 <section class="card">
-  <h2>{{ student.full_name }}</h2>
+  <div class="identity">
+    <span class="avatar portrait">{% include "components/avatar.html" %}</span>
+    <div><p class="meta">{% if employee %}Сотрудник{% else %}Студент{% endif %}</p>
+      <h2>{% firstof employee.full_name student.full_name %}</h2></div>
+  </div>
   <dl class="facts">
+  {% if employee %}
+    <dt>Кафедра</dt><dd>{{ employee.department }}</dd>
+    <dt>Должность</dt><dd>{{ employee.position }}</dd>
+  {% else %}
     <dt>Факультет</dt><dd>{{ student.faculty|default:"Не указан" }}</dd>
     <dt>Направление</dt><dd>{{ student.program|default:"Не указано" }}</dd>
     <dt>Курс</dt><dd>{{ student.year|default:"Не указан" }}</dd>
     <dt>Группа</dt><dd>{{ student.group_name|default:"Не указана" }}</dd>
+  {% endif %}
   </dl>
 </section>
+<section class="card">
+  <h2>Оформление кабинета</h2>
+  {% if request.GET.saved and not appearance_form.is_bound %}<p role="status">Настройки сохранены.</p>{% endif %}
+  <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data" class="stack personal-form">
+    {% csrf_token %}
+    <div>{{ appearance_form.photo.label_tag }}{{ appearance_form.photo }}
+      <small>JPG, PNG или WebP до 4 МБ. Изображение будет обрезано по центру.</small>{{ appearance_form.photo.errors }}</div>
+    {% if has_avatar %}<label class="check">{{ appearance_form.remove }} Вернуть инициалы</label>{% endif %}
+    <fieldset class="accents"><legend>Акцентный цвет</legend>
+      <div>{% for option in appearance_form.accent %}<label class="swatch">{{ option.tag }} {{ option.choice_label }}</label>{% endfor %}</div>
+      {{ appearance_form.accent.errors }}
+    </fieldset>
+    <button class="primary">Сохранить изменения</button>
+  </form>
+</section>
+</div>
 {% endblock %}

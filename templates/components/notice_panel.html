@@ -1,0 +1,4 @@
+{% for notice in items %}
+<article class="panel-item"><small>{{ notice.source }} · {{ notice.created_at|date:"j E, H:i" }}</small>
+<h3>{% if notice.category == "change" %}<a href="{{ notice.target_url }}">{{ notice.title }}</a>{% else %}{{ notice.title }}{% endif %}</h3><p>{{ notice.body }}</p></article>
+{% empty %}<p>Уведомлений пока нет.</p>{% endfor %}

@@ -1,9 +1,12 @@
+from io import BytesIO
 from uuid import UUID, uuid4
 
 from django import forms
 from django.core.signing import BadSignature, Signer
 
-from .models import StudentRequest
+from PIL import Image, ImageOps
+
+from .models import Appearance, StudentRequest
 
 
 class RequestForm(forms.Form):
@@ -30,3 +33,28 @@ class RequestForm(forms.Form):
         if data.get("kind") == StudentRequest.Kind.APPEAL and not data.get("message"):
             self.add_error("message", "Введите текст обращения в деканат.")
         return data
+
+
+class AppearanceForm(forms.Form):
+    accent = forms.ChoiceField(label="Акцентный цвет", choices=Appearance.COLORS, widget=forms.RadioSelect)
+    photo = forms.FileField(label="Новое изображение", required=False,
+                            widget=forms.FileInput(attrs={"accept": "image/jpeg,image/png,image/webp"}))
+    remove = forms.BooleanField(label="Вернуть инициалы", required=False)
+
+    def clean_photo(self):
+        photo = self.cleaned_data["photo"]
+        if not photo:
+            return None
+        if photo.size > 4 * 1024 * 1024:
+            raise forms.ValidationError("Выберите изображение до 4 МБ.")
+        try:
+            with Image.open(photo, formats=("JPEG", "PNG", "WEBP")) as image:
+                if image.width * image.height > 16_000_000:
+                    raise forms.ValidationError("Выберите изображение до 16 мегапикселей.")
+                image = ImageOps.exif_transpose(image).convert("RGB")
+                thumbnail = ImageOps.fit(image, (256, 256), method=Image.Resampling.LANCZOS)
+                output = BytesIO()
+                thumbnail.save(output, format="JPEG", quality=85)
+                return output.getvalue()
+        except (OSError, ValueError, SyntaxError, Image.DecompressionBombError):
+            raise forms.ValidationError("Выберите исправное изображение JPG, PNG или WebP.")

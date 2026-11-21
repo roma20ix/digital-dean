@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 
-from cabinet.models import StudentProfile, StudentRequest
+from cabinet.models import EmployeeProfile, StudentProfile, StudentRequest
 
 from ._academic_demo import seed_academics
 
@@ -21,6 +21,23 @@ class Command(BaseCommand):
         password_b = os.environ.get("DEMO_STUDENT_B_PASSWORD", "")
         if not password_a.strip() or not password_b.strip() or password_a == password_b:
             raise CommandError("Задайте разные DEMO_STUDENT_A_PASSWORD и DEMO_STUDENT_B_PASSWORD.")
+
+        teacher_password = os.environ.get("DEMO_TEACHER_PASSWORD", "")
+        employee = EmployeeProfile.objects.filter(user__username="teacher_a", is_demo=True).first()
+        if teacher_password:
+            if not teacher_password.strip() or teacher_password in (password_a, password_b):
+                raise CommandError("Для DEMO_TEACHER_PASSWORD задайте отдельный пароль.")
+            teacher, created = get_user_model().objects.get_or_create(username="teacher_a")
+            if not created and (employee is None or teacher.is_staff or teacher.is_superuser):
+                raise CommandError("Логин teacher_a уже занят другой учётной записью.")
+            if not teacher.check_password(teacher_password):
+                teacher.set_password(teacher_password)
+                teacher.save(update_fields=["password"])
+            employee, _ = EmployeeProfile.objects.update_or_create(user=teacher, defaults={
+                "full_name": "Анна Соколова", "department": "Кафедра прикладной математики",
+                "position": "Старший преподаватель", "is_demo": True,
+            })
+            self.stdout.write("Подготовлен демоаккаунт teacher_a.")
 
         profiles = [
             ("student_a", password_a, "Алина Соколова", "Экономический", "Экономика", 2, "ЭК-21"),
@@ -50,5 +67,5 @@ class Command(BaseCommand):
                 owner=user, submission_token=uuid5(NAMESPACE_URL, f"digital-dean/demo/{username}"),
                 defaults={**example, "created_at": created_at},
             )
-            seed_academics(profile)
+            seed_academics(profile, employee)
         self.stdout.write("Подготовлены демоаккаунты student_a и student_b.")

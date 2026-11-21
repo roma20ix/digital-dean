@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Кабинет преподавателя{% endblock %}
+{% block content %}
+<h1>Кабинет преподавателя</h1>
+<p class="byline">{{ employee.full_name }} · {{ employee.department }}</p>
+<section class="card">
+  <h2>Ближайшие занятия</h2>
+  {% for lesson in upcoming %}<div class="faculty-lesson">
+    <span>{{ lesson.starts_at|date:"j E, H:i" }} – {{ lesson.ends_at|date:"H:i" }}</span>
+    <div><a href="{{ lesson.detail_url }}">{{ lesson.subject }}</a><p class="meta">Группа {{ lesson.group_name }} · Аудитория {{ lesson.room }}</p></div>
+  </div>{% empty %}<p>Предстоящих занятий пока нет.</p>{% endfor %}
+  <a class="primary" href="{% url 'schedule' %}?mode=week">Расписание на неделю</a>
+</section>
+{% endblock %}

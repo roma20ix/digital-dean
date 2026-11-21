@@ -25,6 +25,13 @@ class MobileRequestsTest(StaticLiveServerTestCase):
             browser = playwright.chromium.launch(executable_path=os.getenv("CHROMIUM_PATH"))
             page = browser.new_page(viewport={"width": 360, "height": 740})
             page.goto(self.live_server_url + reverse("profile"))
+            theme = page.get_by_role("button", name="Тема оформления")
+            for choice in ("light", "dark"):
+                theme.click()
+                page.locator(f'[data-theme="{choice}"]').click()
+                page.reload()
+                expect(page.locator(f'[data-theme="{choice}"]')).to_have_attribute("aria-pressed", "true")
+                self.assertEqual(page.evaluate("getComputedStyle(document.documentElement).colorScheme"), choice)
             username = page.locator('[name="username"]')
             secret = page.locator('[name="password"]')
 
@@ -46,7 +53,7 @@ class MobileRequestsTest(StaticLiveServerTestCase):
 
             def section(label):
                 activate(page.locator("summary"))
-                activate(page.get_by_role("navigation").get_by_text(label, exact=True))
+                activate(page.get_by_role("navigation").get_by_role("link", name=label, exact=True))
 
             fits()
             username.fill(user.username)
@@ -57,6 +64,7 @@ class MobileRequestsTest(StaticLiveServerTestCase):
             secret.fill(password)
             activate(page.get_by_role("button", name="Войти"))
             expect(page.get_by_role("heading", name=name)).to_be_visible()
+            expect(page.locator('[data-theme="dark"]')).to_have_attribute("aria-pressed", "true")
             fits()
 
             section("Мои заявки")
