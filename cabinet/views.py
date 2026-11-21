@@ -10,7 +10,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from .forms import RequestForm
-from .models import CourseResult, Exam, Lesson, Notice, StudentProfile, StudentRequest
+from .models import Attendance, CourseResult, Exam, Lesson, Notice, StudentProfile, StudentRequest
 
 
 @login_not_required
@@ -91,6 +91,9 @@ def schedule(request):
 
     return render(request, "schedule.html", {
         "mode": mode, "date": selected.isoformat(), "days": days,
+        "lesson_count": sum(len(entries) for entries in by_date.values()),
+        "teaching_minutes": sum(int((lesson.ends_at - lesson.starts_at).total_seconds() // 60)
+                                for entries in by_date.values() for lesson in entries),
         "prev_url": link(-length), "next_url": link(length), "next_teaching_url": next_teaching_url,
     })
 
@@ -145,3 +148,48 @@ def notice_read(request, pk):
     if not updated:
         return HttpResponse("Уведомление не найдено.", status=404, content_type="text/plain; charset=utf-8")
     return redirect("inbox")
+
+
+def cabinet_header(request):
+    if not request.user.is_authenticated:
+        return {}
+    student = student_context(request.user)
+    name = student.full_name if isinstance(student, StudentProfile) else student["full_name"]
+    return {"avatar_initials": "".join(part[0] for part in name.split()[:2]).upper(),
+            "has_unread": student_notices(request.user, timezone.now()).filter(is_read=False).exists()}
+
+
+@never_cache
+@require_POST
+def notice_panel(request):
+    notices = student_notices(request.user, timezone.now())
+    items = list(notices)
+    response = render(request, "components/notice_panel.html", {"items": items})
+    notices.filter(pk__in=[item.pk for item in items if not item.is_read]).update(is_read=True)
+    return response
+
+
+@never_cache
+@require_GET
+def attendance(request):
+    lessons = student_lessons(request.user).filter(ends_at__lte=timezone.now()).order_by("subject", "-starts_at")
+    marks = dict(Attendance.objects.filter(student__user=request.user, lesson__in=lessons)
+                 .values_list("lesson_id", "present"))
+    courses = {}
+    for lesson in lessons:
+        course = courses.setdefault(lesson.subject, {"subject": lesson.subject, "entries": [], "present": 0, "marked": 0})
+        mark = marks.get(lesson.pk)
+        course["entries"].append({"lesson": lesson, "mark": mark})
+        if mark is not None:
+            course["marked"] += 1
+            course["present"] += int(mark)
+    for course in courses.values():
+        if course["marked"]:
+            course["percent"] = round(100 * course["present"] / course["marked"])
+    return render(request, "attendance.html", {"courses": courses.values()})
+
+
+@never_cache
+@require_GET
+def media(request):
+    return render(request, "media.html")

@@ -133,3 +133,24 @@ class AcademicSectionsTests(TestCase):
         self.assertFalse(self.client.get("/").context["changes"].exists())
         self.assertNotIn(previous, self.client.get("/inbox/").context["items"])
         self.assertEqual(self.client.post(reverse("notice_read", args=[previous.pk])).status_code, 404)
+
+    def test_panel_marks_only_visible_user_notices(self):
+        url = reverse("notice_panel")
+        self.assertEqual(self.client.get(url).status_code, 405)
+        self.assertContains(self.client.post(url), "Линейная алгебра")
+        self.assertFalse(self.client.get("/").context["has_unread"])
+        self.client.force_login(self.b.user)
+        self.assertTrue(self.client.get("/").context["has_unread"])
+
+    def test_attendance_uses_own_marks_and_excludes_unmarked(self):
+        from .models import Attendance
+        past = Lesson.objects.filter(group_name=self.a.group_name, ends_at__lt=timezone.now()).first()
+        Attendance.objects.filter(student=self.a).delete()
+        Attendance.objects.update_or_create(student=self.b, lesson=past, defaults={"present": False})
+        courses = self.client.get(reverse("attendance")).context["courses"]
+        self.assertTrue(courses)
+        self.assertTrue(all(course["marked"] == 0 for course in courses))
+        Attendance.objects.create(student=self.a, lesson=past, present=True)
+        response = self.client.get(reverse("attendance"))
+        self.assertContains(response, "100%")
+        self.assertNotContains(response, "Гражданское право")

@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 
 from django.utils import timezone
 
-from cabinet.models import CourseResult, Exam, Lesson, Notice
+from cabinet.models import Attendance, CourseResult, Exam, Lesson, Notice
 
 
 # Фиксированные даты показа сохраняют адреса занятий после повторного seed_demo.
@@ -44,6 +44,8 @@ def seed_academics(student):
             defaults={"subject": topic, "teacher": lecturer, "ends_at": starts_at + timedelta(minutes=90),
                       "room": new_room if moved else normal_room, "old_room": normal_room if moved else ""},
         )
+        if lesson.ends_at <= timezone.now():
+            Attendance.objects.get_or_create(student=student, lesson=lesson, defaults={"present": offset % 5 != 2})
         if moved:
             Notice.objects.get_or_create(
                 recipient=student, lesson=lesson,

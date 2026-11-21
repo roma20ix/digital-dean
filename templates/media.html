@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Медиацентр{% endblock %}
+{% block content %}
+<h1>Медиацентр</h1>
+<div class="resources">
+  <section class="card"><h2>Новости</h2>
+    <a href="{% url 'inbox' %}">Объявления деканата</a><p>Сроки, изменения и сообщения для вашей группы.</p>
+    <a href="https://minobrnauki.gov.ru/press-center/news/">Новости Минобрнауки России ↗</a><p>Официальные новости высшего образования.</p>
+  </section>
+  <section class="card"><h2>Для учёбы</h2>
+    <a href="https://rusneb.ru/">Национальная электронная библиотека ↗</a><p>Поиск книг и научных изданий.</p>
+    <a href="https://openedu.ru/">Открытое образование ↗</a><p>Онлайн-курсы российских университетов.</p>
+  </section>
+</div>
+{% endblock %}

@@ -115,3 +115,57 @@ textarea { min-height: 7rem; resize: vertical; }
   .login-art { min-height: 8rem; }
   .login-art .book-stack { scale: .66; }
 }
+
+.theme-trigger, .bell, .avatar, .drawer-head button {
+  min-height: 2.5rem; border: 1px solid var(--line); border-radius: .75rem;
+  background: var(--surface); color: var(--ink); display: inline-flex;
+  align-items: center; justify-content: center; gap: .5rem; padding: .4rem .7rem;
+}
+.theme-trigger { font-size: .88rem; }
+#theme-options, .stack select::picker(select) {
+  border: 1px solid var(--line); border-radius: .85rem; padding: .35rem;
+  background: var(--surface); color: var(--ink); box-shadow: 0 12px 36px #1113;
+}
+#theme-options { inset: auto; position: fixed; margin: 0; min-width: 10rem; }
+#theme-options button, .stack option {
+  display: block; padding: .55rem .75rem; border-radius: .5rem; background: transparent;
+  color: var(--ink); border: 0; text-align: left; width: 100%;
+}
+#theme-options button:hover, .stack option:hover { background: var(--subtle); }
+#theme-options [aria-pressed=true], .stack option:checked { color: var(--accent); background: var(--selected); }
+@supports (appearance: base-select) {
+  .stack select, .stack select::picker(select) { appearance: base-select; }
+}
+.bell { position: relative; width: 2.5rem; }
+.bell i { position: absolute; top: .3rem; right: .36rem; width: .56rem; height: .56rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+.avatar { padding: 0; white-space: nowrap; height: 2.5rem; border-radius: 50%; background: var(--selected); color: var(--accent); text-decoration: none; width: 2.5rem; font-weight: 720; }
+.drawer { box-sizing: border-box; inset: 0 0 0 auto; margin: 0; width: min(26rem, 96vw); height: 100dvh; max-height: none; max-width: none; border: 0; border-left: 1px solid var(--line); padding: 1.25rem; color: var(--ink); background: var(--surface); }
+.drawer::backdrop { background: #10142466; }
+@media (prefers-reduced-motion: no-preference) {
+  .drawer[open] { animation: arrive .18s ease-out; }
+  @keyframes arrive { from { transform: translateX(100%); } }
+}
+.drawer-head, .att-course summary, .att-course li { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.drawer-head h2 { margin: 0; }
+.drawer-head button { font-size: 1.3rem; }
+.panel-item { padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.panel-item small, .resources p { color: var(--muted); }
+.panel-item h3 { margin: .25rem 0; }
+.drawer-content { margin: .75rem 0 1rem; }
+.att-course summary { padding: .65rem .8rem; }
+.att-course summary::after { content: "+"; color: var(--accent); }
+.att-course[open] summary::after { content: "−"; }
+.att-score { margin-left: auto; color: var(--accent); font-weight: 650; }
+.att-course ul { list-style: none; padding: 0; }
+.att-course li { padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.resources { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(18rem,100%),1fr)); gap: 1rem; }
+.resources .card { margin: 0; }
+.resources p + a { display: inline-block; margin-top: 1rem; }
+@media (max-width: 38rem) {
+  .theme-trigger span { display: none; }
+  .tools { gap: .22rem; }
+  .theme-trigger, .bell, .avatar { width: 2.15rem; min-height: 2.3rem; padding: .2rem; }
+  .mast { padding-inline: .6rem; }
+  .mast summary { padding-inline: .5rem; }
+  .brand { max-width: 8rem; line-height: 1.12; }
+}

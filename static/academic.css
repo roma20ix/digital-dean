@@ -64,3 +64,21 @@
   .band { margin-right: 4rem; min-height: 1.7rem; }
   .card-title { flex-direction: row; align-items: center; }
 }
+.calendar-today { display: inline-block; margin-bottom: .8rem; }
+.week-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: .85rem; margin-bottom: 1rem; background: var(--surface); }
+.week-grid { display: grid; grid-template-columns: repeat(7,minmax(7.25rem,1fr)); }
+.week-grid.aligned { grid-template-columns: 3.5rem repeat(7,minmax(7.25rem,1fr)); }
+.week-grid .day { margin: 0; border: 0; border-radius: 0; padding: .4rem; }
+.week-grid.aligned .day { display: contents; }
+.week-heading, .week-grid .axis { margin: 0; padding: .7rem .45rem; background: var(--subtle); font-size: .86rem; }
+.week-heading a { color: var(--ink); }
+.week-grid .axis { grid-column: 1; position: sticky; left: 0; font-variant-numeric: tabular-nums; z-index: 1; }
+.week-grid .period { display: block; min-width: 0; margin: .25rem; padding: .6rem; border: 0; border-left: 3px solid var(--accent); border-radius: .4rem; background: var(--selected); font-size: .82rem; }
+.week-grid .period h3, .week-grid .time { font-size: .85rem; }
+.week-grid .day > p { margin: .4rem; color: var(--muted); font-size: .78rem; }
+.calendar-caption { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: baseline; }
+.calendar-caption strong { font-size: 1.25rem; }
+.calendar-caption span { color: var(--muted); font-size: .9rem; }
+
+.week-grid .axis { white-space: nowrap; font-size: .8rem; }
+.week-grid h3 a { color: var(--ink); text-underline-offset: .15em; }

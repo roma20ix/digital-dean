@@ -161,3 +161,12 @@ class Notice(models.Model):
         if self.lesson_id:
             return self.lesson.detail_url
         return reverse("inbox")
+
+
+class Attendance(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    present = models.BooleanField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["student", "lesson"], name="student_lesson_attendance")]

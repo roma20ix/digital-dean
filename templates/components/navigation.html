@@ -6,6 +6,8 @@
   <a href="{% url 'requests' %}" {% if page == "requests" or page == "request_detail" or page == "request_new" %}aria-current="location"{% endif %}>{% include "components/icon.html" with name="requests" %}Мои заявки</a>
   <a href="{% url 'inbox' %}" {% if page == "inbox" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="inbox" %}Уведомления</a>
   <a href="{% url 'profile' %}" {% if page == "profile" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="profile" %}Профиль</a>
+  <a href="{% url 'attendance' %}" {% if page == "attendance" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="schedule" %}Посещаемость</a>
+  <a href="{% url 'media' %}" {% if page == "media" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="study" %}Медиацентр</a>
   <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout">{% include "components/icon.html" with name="logout" %}Выйти</button></form>
 </nav>
 {% endwith %}
