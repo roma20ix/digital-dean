@@ -1,0 +1,13 @@
+{% extends "learning/base.html" %}
+{% block title %}Чат курса · {{ course.title }}{% endblock %}
+{% block learning_content %}
+<a class="back" href="{% url 'course_detail' course.pk %}">← {{ course.title }}</a>
+<h1>Чат курса</h1>
+<section class="panel prose"><h2>{{ course.title }} · {{ course.student.group_name }}</h2>
+{% for message in messages_list %}<article class="unit">
+  <h3>{{ message.author.full_name }}</h3><small>{{ message.created_at|date:"j E, H:i" }}</small>
+  <p>{{ message.body|linebreaksbr }}</p>
+</article>{% empty %}<p>В группе ещё нет сообщений.</p>{% endfor %}
+<form class="stack" id="latest" method="post">{% csrf_token %}{{ form.as_div }}
+<button class="primary">Отправить сообщение</button></form></section>
+{% endblock %}

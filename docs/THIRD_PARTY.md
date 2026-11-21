@@ -17,3 +17,5 @@
 | whitenoise 6.12.0 | Раздача статики | MIT | [WhiteNoise](https://pypi.org/project/whitenoise/6.12.0/) |
 
 В проверках интерфейса используется Python Playwright 1.62.0 (Apache-2.0), который запускает отдельно установленный Chromium. [Playwright](https://pypi.org/project/playwright/1.62.0/) · [Лицензии Chromium](https://chromium.googlesource.com/chromium/src/+/main/LICENSE)
+
+Два 15-секундных учебных ролика в `static/learning/` созданы для проекта из собственных текстовых слайдов. «Сложение векторов» иллюстрирует сложение по координатам, «Разбор договора» — поиск сторон, предмета и срока. Текстовый разбор доступен рядом с проигрывателем.

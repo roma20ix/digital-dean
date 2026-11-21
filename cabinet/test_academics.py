@@ -100,7 +100,7 @@ class AcademicSectionsTests(TestCase):
             home = self.client.get("/").context
             self.assertEqual(home["next_deadline"].title, deadline)
             self.assertEqual(home["next_lesson"].group_name, student.group_name)
-            self.assertEqual(home["next_deadline"].target_url, reverse("inbox"))
+            self.assertEqual(home["next_deadline"].target_url, home["next_deadline"].work.detail_url)
             self.assertIn("18:00", home["next_deadline"].body)
         self.assertEqual(timezone.localdate(home["next_lesson"].starts_at), date(2026, 11, 21))
         self.clock.return_value = datetime(2026, 12, 5, tzinfo=dt_timezone.utc)
