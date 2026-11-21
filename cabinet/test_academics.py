@@ -39,7 +39,8 @@ class AcademicSectionsTests(TestCase):
         path, fragment = change.target_url.split("#")
         selected = self.client.get(path).context
         self.assertEqual(selected["date"], "2026-11-20")
-        self.assertEqual(selected["days"][0]["lessons"], [lesson])
+        self.assertEqual(selected["days"][0]["lessons"][0], lesson)
+        self.assertEqual(len(selected["days"][0]["lessons"]), 3)
         self.assertEqual(fragment, f"lesson-{lesson.pk}")
         lesson.room = "222"
         lesson.save(update_fields=["room"])
@@ -61,7 +62,8 @@ class AcademicSectionsTests(TestCase):
         self.assertEqual(self.client.get(context["prev_url"]).context["date"], "2026-11-16")
         self.assertEqual(self.client.get(context["next_url"]).context["date"], "2026-11-30")
         moved = self.client.get("/").context["next_lesson"]
-        self.assertEqual(days[0]["lessons"], [moved])
+        self.assertEqual(days[0]["lessons"][0], moved)
+        self.assertEqual(len(days[0]["lessons"]), 3)
         self.assertEqual((moved.subject, moved.old_room, moved.room), ("Гражданское право", "107", "312"))
         # Даже если в query есть чужая группа, субботнее занятие относится к ЮР-11.
         empty = self.client.get("/schedule/", {"date": "2026-11-20", "group_name": self.a.group_name}).context

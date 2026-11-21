@@ -51,3 +51,22 @@ if (bell) {
     if (event.target === drawer && event.clientX < drawer.getBoundingClientRect().left) drawer.close();
   });
 }
+
+const railToggle = document.querySelector(".rail-toggle");
+if (railToggle) {
+  const root = document.documentElement;
+  const syncRail = () => {
+    const compact = root.dataset.rail === "compact";
+    const label = compact ? "Развернуть меню" : "Свернуть меню";
+    railToggle.setAttribute("aria-expanded", String(!compact));
+    railToggle.setAttribute("aria-label", label);
+    railToggle.title = label;
+  };
+  syncRail();
+  railToggle.hidden = false;
+  railToggle.addEventListener("click", () => {
+    root.dataset.rail = root.dataset.rail === "compact" ? "wide" : "compact";
+    syncRail();
+    try { localStorage.setItem("dean-rail", root.dataset.rail); } catch {}
+  });
+}

@@ -52,7 +52,23 @@ class StudentRequest(models.Model):
         return events
 
 
+class EmployeeProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=200)
+    department = models.CharField(max_length=200)
+    position = models.CharField(max_length=120)
+    is_demo = models.BooleanField(default=False)
+
+
+class Appearance(models.Model):
+    COLORS = [("ocean", "Океан"), ("forest", "Шалфей"), ("amber", "Янтарь")]
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    accent = models.CharField(max_length=12, choices=COLORS, default="ocean")
+    avatar = models.BinaryField(null=True)
+
+
 class Lesson(models.Model):
+    instructor = models.ForeignKey(EmployeeProfile, null=True, blank=True, on_delete=models.SET_NULL)
     group_name = models.CharField(max_length=40)
     subject = models.CharField(max_length=200)
     teacher = models.CharField(max_length=200)

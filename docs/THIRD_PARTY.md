@@ -7,6 +7,7 @@
 | Компонент | Использование | Лицензия пакета | Источник |
 |---|---|---|---|
 | Django 5.2.19 | Страницы, модели, авторизация и формы | BSD-3-Clause | [Django](https://pypi.org/project/Django/5.2.19/) |
+| Pillow 13.0.0 | Проверка, обрезка и перекодирование аватара | MIT-CMU | [Pillow](https://pypi.org/project/pillow/13.0.0/) |
 | asgiref 3.13.0 | Адаптеры синхронного и асинхронного кода Django | BSD-3-Clause | [ASGI](https://pypi.org/project/asgiref/3.13.0/) |
 | gunicorn 27.0.1 | WSGI-сервер для Linux | MIT | [Gunicorn](https://pypi.org/project/gunicorn/27.0.1/) |
 | psycopg и psycopg-binary 3.3.9 | Подключение к PostgreSQL | LGPL-3.0-only | [psycopg](https://pypi.org/project/psycopg/3.3.9/), [psycopg-binary](https://pypi.org/project/psycopg-binary/3.3.9/) |

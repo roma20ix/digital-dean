@@ -53,7 +53,7 @@ class MobileRequestsTest(StaticLiveServerTestCase):
 
             def section(label):
                 activate(page.locator("summary"))
-                activate(page.get_by_role("navigation").get_by_text(label, exact=True))
+                activate(page.get_by_role("navigation").get_by_role("link", name=label, exact=True))
 
             fits()
             username.fill(user.username)

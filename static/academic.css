@@ -2,11 +2,11 @@
 .dashboard .card { margin: 0; }
 .lesson {
   grid-column: 1 / -1; position: relative; overflow: hidden; isolation: isolate;
-  background: light-dark(#e8e6fa, #302d4b);
-  border-color: light-dark(#d7d3ee, #45405d);
+  background: var(--selected);
+  border-color: var(--line);
 }
 .lesson-copy { position: relative; width: 67%; min-height: 11rem; display: flex; flex-direction: column; justify-content: center; }
-.lesson .illustration { left: 62%; background-image: radial-gradient(light-dark(#a6a2d0,#747094) 1px, transparent 1px); mask-image: linear-gradient(to right, transparent, black 18%); }
+.lesson .illustration { left: 62%; background-image: radial-gradient(light-dark(#8fb4bc,#5c7e86) 1px, transparent 1px); mask-image: linear-gradient(to right, transparent, black 18%); }
 .band { display: flex; align-items: center; gap: .55rem; color: var(--accent); font-size: .9rem; letter-spacing: .01em; }
 .pad h3 { margin: .35rem 0; font-size: clamp(1.4rem, 2.8vw, 2.25rem); letter-spacing: -.04em; }
 .pad h3 a, .entry a, .card-title + a:not(.primary) { color: var(--ink); font-weight: 650; text-decoration: none; }
@@ -82,3 +82,4 @@
 
 .week-grid .axis { white-space: nowrap; font-size: .8rem; }
 .week-grid h3 a { color: var(--ink); text-underline-offset: .15em; }
+.daily-agenda { margin-top: 1rem; }

@@ -7,6 +7,7 @@
   };
   let current = "system";
   try {
+    if (localStorage.getItem("dean-rail") === "compact") document.documentElement.dataset.rail = "compact";
     const saved = localStorage.getItem(key);
     if (choices.includes(saved)) current = saved;
   } catch {} // The selector still works when storage is unavailable.

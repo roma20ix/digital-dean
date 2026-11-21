@@ -1,16 +1,17 @@
+from functools import wraps
 from datetime import date, datetime, time, timedelta
 
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import F, Q
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
-from .forms import RequestForm
-from .models import Attendance, CourseResult, Exam, Lesson, Notice, StudentProfile, StudentRequest
+from .forms import AppearanceForm, RequestForm
+from .models import Appearance, EmployeeProfile, Attendance, CourseResult, Exam, Lesson, Notice, StudentProfile, StudentRequest
 
 
 @login_not_required
@@ -32,6 +33,15 @@ def student_lessons(user):
     return Lesson.objects.filter(group_name__in=group)
 
 
+def student_only(view):
+    @wraps(view)
+    def wrapped(request, *args, **kwargs):
+        if getattr(request.user, "employeeprofile", None):
+            raise Http404
+        return view(request, *args, **kwargs)
+    return wrapped
+
+
 def student_notices(user, now):
     return Notice.objects.filter(
         Q(lesson__isnull=True) | Q(lesson__group_name=F("recipient__group_name")),
@@ -43,10 +53,18 @@ def student_notices(user, now):
 @require_GET
 def today(request):
     now = timezone.now()
+    employee = getattr(request.user, "employeeprofile", None)
+    if employee:
+        lessons = Lesson.objects.filter(instructor=employee, ends_at__gt=now)
+        return render(request, "employee_today.html", {"upcoming": lessons[:6], "employee": employee})
     notices = student_notices(request.user, now)
+    lessons = student_lessons(request.user)
+    local_day = timezone.localdate(now)
+    start = timezone.make_aware(datetime.combine(local_day, time.min))
     return render(request, "today.html", {
+        "today_lessons": lessons.filter(starts_at__gte=start, starts_at__lt=start + timedelta(days=1)),
         "student": student_context(request.user),
-        "next_lesson": student_lessons(request.user).filter(ends_at__gt=now).first(),
+        "next_lesson": lessons.filter(ends_at__gt=now).first(),
         "next_deadline": notices.filter(category=Notice.Category.DEADLINE, due_at__gte=now).order_by("due_at", "pk").first(),
         "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
         "changes": notices.filter(category=Notice.Category.CHANGE),
@@ -54,9 +72,33 @@ def today(request):
 
 
 @never_cache
-@require_GET
+@require_http_methods(["GET", "POST"])
 def profile(request):
-    return render(request, "profile.html", {"student": student_context(request.user)})
+    employee = getattr(request.user, "employeeprofile", None)
+    appearance = Appearance.objects.filter(user=request.user).values("accent").first()
+    if request.method == "POST":
+        form = AppearanceForm(request.POST, request.FILES)
+    else:
+        form = AppearanceForm(initial=appearance or {"accent": "ocean"})
+    if form.is_bound and form.is_valid():
+        values = {"accent": form.cleaned_data["accent"]}
+        if form.cleaned_data["photo"]:
+            values["avatar"] = form.cleaned_data["photo"]
+        elif form.cleaned_data["remove"]:
+            values["avatar"] = None
+        Appearance.objects.update_or_create(user=request.user, defaults=values)
+        return redirect(reverse("profile") + "?saved=1")
+    return render(request, "profile.html", {"student": student_context(request.user),
+                                           "employee": employee, "appearance_form": form})
+
+
+@never_cache
+@require_GET
+def avatar(request):
+    photo = Appearance.objects.filter(user=request.user).values_list("avatar", flat=True).first()
+    if not photo:
+        raise Http404
+    return HttpResponse(bytes(photo), content_type="image/jpeg")
 
 
 @never_cache
@@ -73,7 +115,8 @@ def schedule(request):
     length = 7 if mode == "week" else 1
     start = selected - timedelta(days=selected.weekday()) if mode == "week" else selected
     by_date = {start + timedelta(days=i): [] for i in range(length)}
-    lessons = student_lessons(request.user)
+    employee = getattr(request.user, "employeeprofile", None)
+    lessons = Lesson.objects.filter(instructor=employee) if employee else student_lessons(request.user)
     lower = timezone.make_aware(datetime.combine(start, time.min))
     upper = lower + timedelta(days=length)
     for lesson in lessons.filter(starts_at__gte=lower, starts_at__lt=upper):
@@ -100,6 +143,7 @@ def schedule(request):
 
 @never_cache
 @require_GET
+@student_only
 def study(request):
     courses = CourseResult.objects.filter(student__user=request.user)
     exams = Exam.objects.filter(course__in=courses, starts_at__gte=timezone.now()).select_related("course")
@@ -108,12 +152,14 @@ def study(request):
 
 @never_cache
 @require_GET
+@student_only
 def requests(request):
     return render(request, "requests/list.html", {"items": StudentRequest.objects.filter(owner=request.user)})
 
 
 @never_cache
 @require_http_methods(["GET", "POST"])
+@student_only
 def request_new(request):
     form = RequestForm(request.POST if request.method == "POST" else None, user=request.user)
     if form.is_bound and form.is_valid():
@@ -128,6 +174,7 @@ def request_new(request):
 
 @never_cache
 @require_GET
+@student_only
 def request_detail(request, pk):
     item = StudentRequest.objects.filter(owner=request.user, pk=pk).first()
     if item is None:
@@ -137,12 +184,14 @@ def request_detail(request, pk):
 
 @never_cache
 @require_GET
+@student_only
 def inbox(request):
     return render(request, "inbox.html", {"items": student_notices(request.user, timezone.now())})
 
 
 @never_cache
 @require_POST
+@student_only
 def notice_read(request, pk):
     updated = student_notices(request.user, timezone.now()).filter(pk=pk).update(is_read=True)
     if not updated:
@@ -153,14 +202,18 @@ def notice_read(request, pk):
 def cabinet_header(request):
     if not request.user.is_authenticated:
         return {}
-    student = student_context(request.user)
-    name = student.full_name if isinstance(student, StudentProfile) else student["full_name"]
-    return {"avatar_initials": "".join(part[0] for part in name.split()[:2]).upper(),
-            "has_unread": student_notices(request.user, timezone.now()).filter(is_read=False).exists()}
+    employee = getattr(request.user, "employeeprofile", None)
+    appearance = Appearance.objects.filter(user=request.user).values_list("accent", Q(avatar__isnull=True)).first()
+    student = employee or student_context(request.user)
+    name = student.full_name if isinstance(student, (EmployeeProfile, StudentProfile)) else student["full_name"]
+    return {"employee_account": employee, "profile_accent": appearance[0] if appearance else "ocean",
+            "has_avatar": bool(appearance and not appearance[1]), "avatar_initials": "".join(part[0] for part in name.split()[:2]).upper(),
+            "has_unread": not employee and student_notices(request.user, timezone.now()).filter(is_read=False).exists()}
 
 
 @never_cache
 @require_POST
+@student_only
 def notice_panel(request):
     notices = student_notices(request.user, timezone.now())
     items = list(notices)
@@ -171,6 +224,7 @@ def notice_panel(request):
 
 @never_cache
 @require_GET
+@student_only
 def attendance(request):
     lessons = student_lessons(request.user).filter(ends_at__lte=timezone.now()).order_by("subject", "-starts_at")
     marks = dict(Attendance.objects.filter(student__user=request.user, lesson__in=lessons)

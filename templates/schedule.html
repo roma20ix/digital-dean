@@ -26,7 +26,7 @@
           <div class="time">{{ lesson.starts_at|date:"H:i" }} – {{ lesson.ends_at|date:"H:i" }}</div>
           <div>
             <h3 id="subject-{{ lesson.id }}">{% if mode == "week" %}<a href="{{ lesson.detail_url }}">{{ lesson.subject }}</a>{% else %}{{ lesson.subject }}{% endif %}</h3>
-            <p>{{ lesson.teacher }}</p>
+            <p>{% if employee_account %}Группа {{ lesson.group_name }}{% else %}{{ lesson.teacher }}{% endif %}</p>
             {% if lesson.old_starts_at %}<p>Прежнее начало — {{ lesson.old_starts_at|date:"j E, H:i" }}</p>{% endif %}
             {% if lesson.old_room %}
               <p class="relocated">{% if mode == "week" %}<strong>Теперь {{ lesson.room }}</strong><br>Была {{ lesson.old_room }}{% else %}<strong>Новая аудитория — {{ lesson.room }}</strong><br>Прежняя аудитория — {{ lesson.old_room }}{% endif %}</p>

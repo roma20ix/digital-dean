@@ -4,7 +4,7 @@
 <h1>Медиацентр</h1>
 <div class="resources">
   <section class="card"><h2>Новости</h2>
-    <a href="{% url 'inbox' %}">Объявления деканата</a><p>Сроки, изменения и сообщения для вашей группы.</p>
+    {% if not employee_account %}<a href="{% url 'inbox' %}">Объявления деканата</a><p>Сроки, изменения и сообщения для вашей группы.</p>{% endif %}
     <a href="https://minobrnauki.gov.ru/press-center/news/">Новости Минобрнауки России ↗</a><p>Официальные новости высшего образования.</p>
   </section>
   <section class="card"><h2>Для учёбы</h2>

@@ -48,5 +48,14 @@
     </section>
   {% endif %}
 </div>
+{% if today_lessons %}
+<section class="card daily-agenda">
+  <h2>Пары на сегодня</h2>
+  {% for lesson in today_lessons %}<div class="faculty-lesson">
+    <strong>{{ lesson.starts_at|date:"H:i" }} – {{ lesson.ends_at|date:"H:i" }}</strong>
+    <div><a href="{{ lesson.detail_url }}">{{ lesson.subject }}</a><p class="meta">{{ lesson.teacher }} · Аудитория {{ lesson.room }}</p></div>
+  </div>{% endfor %}
+</section>
+{% endif %}
 </div>
 {% endblock %}
