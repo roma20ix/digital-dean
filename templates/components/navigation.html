@@ -1,0 +1,11 @@
+{% with page=request.resolver_match.url_name %}
+<nav aria-label="Разделы кабинета">
+  <a href="{% url 'today' %}" {% if page == "today" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="today" %}Сегодня</a>
+  <a href="{% url 'schedule' %}" {% if page == "schedule" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="schedule" %}Расписание</a>
+  <a href="{% url 'study' %}" {% if page == "study" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="study" %}Учёба</a>
+  <a href="{% url 'requests' %}" {% if page == "requests" or page == "request_detail" or page == "request_new" %}aria-current="location"{% endif %}>{% include "components/icon.html" with name="requests" %}Мои заявки</a>
+  <a href="{% url 'inbox' %}" {% if page == "inbox" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="inbox" %}Уведомления</a>
+  <a href="{% url 'profile' %}" {% if page == "profile" %}aria-current="page"{% endif %}>{% include "components/icon.html" with name="profile" %}Профиль</a>
+  <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout">{% include "components/icon.html" with name="logout" %}Выйти</button></form>
+</nav>
+{% endwith %}

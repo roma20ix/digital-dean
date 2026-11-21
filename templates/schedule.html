@@ -17,7 +17,7 @@
   </div>
   {% for day in days %}
     <section class="day">
-      <h2>{{ day.date|date:"l, j E" }}</h2>
+      <h2 class="section-heading">{% include "components/icon.html" with name="schedule" %}{{ day.date|date:"l, j E" }}</h2>
       {% for lesson in day.lessons %}
         <article class="period" id="lesson-{{ lesson.id }}" tabindex="-1" aria-labelledby="subject-{{ lesson.id }}">
           <div class="time">{{ lesson.starts_at|date:"H:i" }} – {{ lesson.ends_at|date:"H:i" }}</div>

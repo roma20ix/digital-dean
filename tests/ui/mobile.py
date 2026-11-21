@@ -25,6 +25,12 @@ class MobileRequestsTest(StaticLiveServerTestCase):
             browser = playwright.chromium.launch(executable_path=os.getenv("CHROMIUM_PATH"))
             page = browser.new_page(viewport={"width": 360, "height": 740})
             page.goto(self.live_server_url + reverse("profile"))
+            theme = page.get_by_role("combobox", name="Тема оформления")
+            for choice in ("light", "dark"):
+                theme.select_option(choice)
+                page.reload()
+                expect(theme).to_have_value(choice)
+                self.assertEqual(page.evaluate("getComputedStyle(document.documentElement).colorScheme"), choice)
             username = page.locator('[name="username"]')
             secret = page.locator('[name="password"]')
 
@@ -57,6 +63,7 @@ class MobileRequestsTest(StaticLiveServerTestCase):
             secret.fill(password)
             activate(page.get_by_role("button", name="Войти"))
             expect(page.get_by_role("heading", name=name)).to_be_visible()
+            expect(theme).to_have_value("dark")
             fits()
 
             section("Мои заявки")
