@@ -22,7 +22,7 @@
     <section class="day" data-column="{{ forloop.counter }}">
       {% if mode == "week" %}<h2 class="week-heading"><a href="?mode=day&amp;date={{ day.date|date:'Y-m-d' }}">{{ day.date|date:"D, j" }}</a></h2>{% else %}<h2 class="section-heading">{% include "components/icon.html" with name="schedule" %}{{ day.date|date:"l, j E" }}</h2>{% endif %}
       {% for lesson in day.lessons %}
-        <article data-start="{{ lesson.starts_at|date:'H:i' }}" class="period" id="lesson-{{ lesson.id }}" tabindex="-1" aria-labelledby="subject-{{ lesson.id }}">
+        <article data-start="{{ lesson.starts_at|date:'H:i' }}" class="period {% cycle 'lesson-blue' 'lesson-green' 'lesson-amber' 'lesson-rose' %}{% if lesson.old_room or lesson.old_starts_at %} lesson-changed{% endif %}" id="lesson-{{ lesson.id }}" tabindex="-1" aria-labelledby="subject-{{ lesson.id }}">
           <div class="time">{{ lesson.starts_at|date:"H:i" }} – {{ lesson.ends_at|date:"H:i" }}</div>
           <div>
             <h3 id="subject-{{ lesson.id }}">{% if mode == "week" %}<a href="{{ lesson.detail_url }}">{{ lesson.subject }}</a>{% else %}{{ lesson.subject }}{% endif %}</h3>
