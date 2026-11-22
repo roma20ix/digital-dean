@@ -76,6 +76,12 @@ def today(request):
         "next_deadline": next_deadline,
         "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
         "changes": notices.filter(category=Notice.Category.CHANGE),
+        "goal_course": CourseResult.objects.filter(
+            student__user=request.user, weeks__tasks__notice__recipient__user=request.user,
+            weeks__tasks__notice__category=Notice.Category.DEADLINE,
+            weeks__tasks__notice__created_at__lte=now,
+            weeks__tasks__notice__due_at__isnull=False,
+        ).distinct().first(),
     })
 
 

@@ -24,6 +24,13 @@
 .course-progress > span { width: 76%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: var(--surface); }
 .course-progress strong { font-size: 2.4rem; line-height: 1; }
 .course-progress small { color: var(--muted); }
+.goal-planner { scroll-margin-top: 1rem; background: linear-gradient(145deg, var(--surface), var(--selected)); }
+.goal-planner label { margin: 1rem 0 .55rem; }
+.goal-planner output { color: var(--accent); font-size: 1.4rem; font-weight: 750; }
+.goal-planner input[type="range"] { display: block; width: 100%; padding: 0; border: 0; background: transparent; accent-color: var(--accent); cursor: pointer; }
+.goal-ticks { display: flex; justify-content: space-between; color: var(--muted); font-size: .8rem; }
+.goal-answer { margin: .8rem 0; min-height: 3.5rem; padding: .8rem; border-radius: .65rem; background: var(--surface); font-weight: 650; }
+.goal-planner .meta { line-height: 1.35; }
 .deadline { font-weight: 650; }
 .unit { padding: .65rem 0; border-top: 1px solid var(--line); }
 .unit summary, .syllabus summary { background: transparent; padding-inline: .25rem; }
@@ -50,7 +57,8 @@
 .work-status.graded { background: var(--success-bg); color: var(--success); }
 .task-row .overdue { color: var(--error); display: block; }
 .prose { max-width: 70ch; }
-.result:target, .unit:target { outline: 2px solid var(--accent); outline-offset: .2rem; }
+.result:target { box-shadow: inset 0 0 0 2px var(--accent); }
+.unit:target { outline: 2px solid var(--accent); outline-offset: .2rem; }
 @media (max-width: 63rem) {
   .course-layout { grid-template-columns: minmax(0, 1fr); }
   .task-row { grid-template-columns: minmax(0, 1fr) auto; }

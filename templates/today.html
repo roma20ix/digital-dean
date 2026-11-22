@@ -53,6 +53,11 @@
     </section>
   {% endif %}
 </div>
+{% if goal_course %}<a class="goal-teaser card" href="{% url 'course_detail' goal_course.pk %}#goal-planner">
+  <span class="goal-teaser-symbol" aria-hidden="true">↗</span>
+  <span><strong>Как дойти до нужной оценки?</strong><small>Попробуйте интерактивный расчёт по курсу «{{ goal_course.title }}».</small></span>
+  <span aria-hidden="true">→</span>
+</a>{% endif %}
 {% if today_lessons %}
 <section class="card daily-agenda">
   <h2>Пары на сегодня</h2>

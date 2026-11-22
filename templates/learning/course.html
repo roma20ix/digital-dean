@@ -2,6 +2,7 @@
 {% load static %}
 {% block title %}{{ course.title }}{% endblock %}
 {% block learning_content %}
+<script defer src="{% static 'goal.js' %}"></script>
 <a class="back" href="{% url 'course_catalog' %}">← Все курсы</a>
 <p class="meta">{{ course.student.group_name }} · {{ course.assessment_type }}</p>
 <h1>{{ course.title }}</h1>
@@ -42,6 +43,14 @@
       {% else %}<p class="meta">Заданий с баллами пока нет.</p>{% endif %}
       <a href="{% url 'study' %}#course-{{ course.pk }}">Смотреть ведомость →</a>
     </section>
+    {% if maximum %}<section class="panel goal-planner" id="goal-planner" data-points="{{ points }}" data-remaining="{{ remaining }}" data-maximum="{{ maximum }}">
+      <p class="band">Что, если…</p><h2>План достижения цели</h2>
+      <label for="goal-target">Хочу получить <output id="goal-value" for="goal-target">7</output> из 10</label>
+      <input id="goal-target" type="range" min="1" max="10" value="7" step="1" aria-describedby="goal-explanation">
+      <div class="goal-ticks" aria-hidden="true"><span>1</span><span>5</span><span>10</span></div>
+      <p class="goal-answer" role="status" aria-live="polite"></p>
+      <p class="meta" id="goal-explanation">Расчёт использует только опубликованные задания. Это прогноз, он не меняет оценку в ведомости.</p>
+    </section>{% endif %}
     <section class="panel"><h2>Ближайший дедлайн</h2>
       {% if nearest %}<p class="deadline">{{ nearest.notice.due_at|date:"j E, H:i" }}</p><small>До сдачи — {{ nearest.notice.due_at|timeuntil:now }}</small>
       <a href="{{ nearest.detail_url }}">{{ nearest.notice.title }}</a>
