@@ -9,7 +9,7 @@
 .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .85rem; }
 .course-card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; min-height: 8.4rem; color: var(--ink); text-decoration: none; }
 .course-card:hover { border-color: var(--accent); }
-.course-card:hover h2 { text-decoration: underline; }
+.course-card:hover h2 { color: var(--accent); }
 .course-foot, .learning small { color: var(--muted); font-size: .85rem; }
 .course-card h2 { margin: .85rem 0 1.3rem; }
 .course-foot { margin-top: auto; justify-content: space-between; }
@@ -20,6 +20,10 @@
 .course-side .panel > a, .course-support a, .unit video, .week-links a { display: block; }
 .course-side .points strong { font-size: 2rem; line-height: 1; }
 .course-side progress { width: 100%; accent-color: var(--accent); }
+.course-progress { width: 9rem; aspect-ratio: 1; margin: .8rem auto 1rem; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(var(--accent) var(--rate), var(--subtle) 0); }
+.course-progress > span { width: 76%; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; background: var(--surface); }
+.course-progress strong { font-size: 2.4rem; line-height: 1; }
+.course-progress small { color: var(--muted); }
 .deadline { font-weight: 650; }
 .unit { padding: .65rem 0; border-top: 1px solid var(--line); }
 .unit summary, .syllabus summary { background: transparent; padding-inline: .25rem; }

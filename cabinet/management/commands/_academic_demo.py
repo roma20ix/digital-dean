@@ -20,16 +20,16 @@ def seed_academics(student, employee=None):
     economics = student.group_name == "ЭК-21"
     if economics:
         subject, teacher, room, new_room = ALGEBRA, "Анна Соколова", "304", "218"
-        moved_on, weekdays, start = date(2026, 11, 20), (0, 2, 4, 5), time(10, 40)
+        moved_on, weekdays, start = date(2026, 11, 20), (0, 1, 2, 3, 4, 5), time(10, 40)
         seminar = ("Микроэкономика", "Олег Белов", "115")
-        grade, credit, pending = 5, "Академическое письмо", "Статистика"
+        grade, credit, pending = 9, "Академическое письмо", "Статистика"
         exam_day, exam_room = date(2026, 12, 2), "310"
         task, due_on = "Сдать задачи по алгебре", moved_on
     else:
         subject, teacher, room, new_room = LAW, "Мария Громова", "107", "312"
-        moved_on, weekdays, start = date(2026, 11, 23), (0, 1, 3, 5), time(13, 20)
+        moved_on, weekdays, start = date(2026, 11, 23), (0, 1, 2, 3, 5), time(13, 20)
         seminar = ("Теория государства", "Лев Новиков", "204")
-        grade, credit, pending = 4, "Юридическая риторика", "История права"
+        grade, credit, pending = 8, "Юридическая риторика", "История права"
         exam_day, exam_room = date(2026, 12, 4), "405"
         task, due_on = "Сдать разбор судебного дела", date(2026, 11, 24)
 
@@ -82,12 +82,16 @@ def seed_academics(student, employee=None):
         (credit, CourseResult.Assessment.CREDIT, None, True),
         (pending, CourseResult.Assessment.EXAM, None, None),
         (workshops[1][0], CourseResult.Assessment.EXAM, 4, None),
-        (workshops[2][0], CourseResult.Assessment.EXAM, 3, None),
+        (workshops[2][0], CourseResult.Assessment.EXAM, 7, None),
+        ("Цифровые инструменты и исследовательские методы", CourseResult.Assessment.EXAM, 10, None),
+        ("Физическая культура", CourseResult.Assessment.CREDIT, None, True),
     ]:
         course, _ = CourseResult.objects.get_or_create(
             student=student, title=title,
             defaults={"assessment_type": assessment, "grade": mark, "passed": passed},
         )
+        if student.is_demo:
+            CourseResult.objects.filter(pk=course.pk).update(grade=mark, passed=passed)
         if title == pending:
             Exam.objects.get_or_create(course=course, starts_at=at(exam_day, 10), defaults={"room": exam_room})
 
