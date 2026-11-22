@@ -2,28 +2,34 @@
 
 Конкурсный личный кабинет студента для MGIMO AI Challenge. Сервер поддерживает вход, профиль, заказ справки и обращение в деканат по [контракту](docs/CONTRACT.md). Для каждого студента доступны собственные заявки и их статусы. Команда `seed_demo` также заполняет расписание, результаты учёбы, уведомления, курсы и задания. Даты и ожидаемые значения для проверки интерфейса приведены в [сценариях A2](docs/evidence/A2/README.md).
 
-## Локальный запуск в Windows PowerShell
+## Локальный запуск на Windows
 
-Из корня репозитория, с установленным Python 3.12 и Python Launcher:
+Для каждого участника нужен **один клон репозитория**. В папке рядом с `manage.py` создайте `.env.local` с двумя разными паролями. Если они уже указаны в `.env`, новый файл не нужен. Для кабинета преподавателя можно добавить третью строку. Файлы `.env` и `.env.local` исключены из Git.
 
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe manage.py check
-.\.venv\Scripts\python.exe manage.py migrate --noinput
-.\.venv\Scripts\python.exe manage.py test
-.\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
+```text
+DEMO_STUDENT_A_PASSWORD=<ваш пароль для student_a>
+DEMO_STUDENT_B_PASSWORD=<другой пароль для student_b>
+DEMO_TEACHER_PASSWORD=<третий пароль для teacher_a>
 ```
 
-В другом окне PowerShell выполните `(Invoke-RestMethod http://127.0.0.1:8000/health/).Trim()`. Ожидаемый ответ — `ok`. Откройте http://127.0.0.1:8000/ в браузере. Для проверки с двумя студентами задайте в окружении команды разные пароли в `DEMO_STUDENT_A_PASSWORD` и `DEMO_STUDENT_B_PASSWORD`. После миграций выполните:
+Для первого и каждого следующего запуска откройте PowerShell в папке проекта и выполните:
 
 ```powershell
-.\.venv\Scripts\python.exe manage.py seed_demo
+powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
 ```
 
-На хостинге используйте те же переменные из хранилища секретов и команду `python manage.py seed_demo`. Логины — `student_a` и `student_b`. У первого есть готовая демонстрационная справка, у второго — принятое обращение. Повторный запуск сохраняет номера, даты и пользовательские заявки. При изменении секрета команда обновляет пароль соответствующего демостудента.
+Скрипт создаёт `.venv` при первом запуске, обновляет зависимости при изменении `requirements.txt`, применяет новые миграции, дополняет демоданные и запускает сайт на `http://127.0.0.1:8001/`. Он использует локальную SQLite `db.sqlite3`, где сохраняются созданные заявки и настройки профиля. Остановите сервер через `Ctrl+C`. Для подготовки без запуска сервера используйте `powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1 -NoServer`.
 
-Локальная конфигурация использует SQLite в `db.sqlite3`, русскую локаль и часовой пояс Europe/Moscow. На Linux используйте `python3.12 -m venv .venv`, затем `.venv/bin/python` для тех же команд.
+Чтобы получить свежие изменения **текущей ветки**, остановите сервер и выполните:
+
+```powershell
+git pull --ff-only
+powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
+```
+
+При переходе на другую ветку выполните `git fetch origin`, затем `git switch <имя-ветки>` и ту же команду запуска. После объединения изменений в основную ветку выполните `git switch main` и `git pull --ff-only`. Проверьте выбранную ветку командой `git branch --show-current`. Если Git сообщает о локальных изменениях, сначала сохраните их коммитом или отдельно, прежде чем переключать ветку.
+
+Пароли из файла используются скриптом для подготовки демоаккаунтов: при каждом запуске `seed_demo` выставляет их для `student_a`, `student_b` и, если задан третий пароль, `teacher_a`. Приложение само `.env` не читает. Скрипт не выполняет `git pull`, поэтому файлы вашего клона обновляются только после вашей команды Git.
 
 ## Первый HTTPS-деплой на Linux
 
