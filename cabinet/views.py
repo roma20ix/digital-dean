@@ -64,15 +64,24 @@ def today(request):
     lessons = student_lessons(request.user)
     local_day = timezone.localdate(now)
     start = timezone.make_aware(datetime.combine(local_day, time.min))
+    today_lessons = list(lessons.filter(starts_at__gte=start, starts_at__lt=start + timedelta(days=1)))
+    next_lesson = lessons.filter(ends_at__gt=now).first()
+    route_day = local_day if today_lessons or not next_lesson else timezone.localdate(next_lesson.starts_at)
+    route_lessons = today_lessons if route_day == local_day else list(lessons.filter(
+        starts_at__gte=timezone.make_aware(datetime.combine(route_day, time.min)),
+        starts_at__lt=timezone.make_aware(datetime.combine(route_day + timedelta(days=1), time.min)),
+    ))
     next_deadline = (
         notices.filter(Q(work__isnull=True) | Q(work__status__in=CourseTask.OPEN),
                        category=Notice.Category.DEADLINE, due_at__gte=now)
         .select_related("work__week__course").order_by("due_at", "pk").first()
     )
     return render(request, "today.html", {
-        "today_lessons": lessons.filter(starts_at__gte=start, starts_at__lt=start + timedelta(days=1)),
+        "today_lessons": today_lessons,
+        "route_day": route_day,
+        "route_lessons": route_lessons,
         "student": student_context(request.user),
-        "next_lesson": lessons.filter(ends_at__gt=now).first(),
+        "next_lesson": next_lesson,
         "next_deadline": next_deadline,
         "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
         "changes": notices.filter(category=Notice.Category.CHANGE),

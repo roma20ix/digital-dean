@@ -1,4 +1,31 @@
 const week = document.querySelector(".week-grid");
+const route = document.querySelector(".day-route");
+if (route) {
+  const stops = [...route.querySelectorAll("[data-route-stop]")];
+  const previews = [...route.querySelectorAll("[data-route-preview]")];
+  const show = index => {
+    stops.forEach((stop, i) => stop.classList.toggle("is-active", i === index));
+    previews.forEach((preview, i) => {
+      preview.hidden = i !== index;
+      preview.classList.toggle("is-active", i === index);
+    });
+  };
+  stops.forEach((stop, index) => {
+    stop.addEventListener("pointerenter", () => show(index));
+    stop.addEventListener("focus", () => show(index));
+  });
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    route.addEventListener("pointermove", event => {
+      const rect = route.getBoundingClientRect();
+      route.style.setProperty("--route-x", `${event.clientX - rect.left}px`);
+      route.style.setProperty("--route-y", `${event.clientY - rect.top}px`);
+    });
+    route.addEventListener("pointerleave", () => {
+      route.style.removeProperty("--route-x");
+      route.style.removeProperty("--route-y");
+    });
+  }
+}
 const snowToggle = document.querySelector(".snow-toggle");
 if (snowToggle) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");

@@ -53,14 +53,28 @@
     </section>
   {% endif %}
 </div>
-{% if today_lessons %}
-<section class="card daily-agenda">
-  <h2>Пары на сегодня</h2>
-  {% for lesson in today_lessons %}<div class="faculty-lesson">
-    <strong>{{ lesson.starts_at|date:"H:i" }} – {{ lesson.ends_at|date:"H:i" }}</strong>
-    <div><a href="{{ lesson.detail_url }}">{{ lesson.subject }}</a><p class="meta">{{ lesson.teacher }} · Аудитория {{ lesson.room }}</p></div>
-  </div>{% endfor %}
+<section class="card day-route" aria-labelledby="route-heading">
+  <div class="route-heading"><div><p class="band">Ваш день, одним взглядом</p><h2 id="route-heading">Маршрут занятий</h2></div>
+    <span class="date-chip">{{ route_day|date:"j E, l" }}</span></div>
+  {% if route_lessons %}
+  <p class="meta route-hint">Наведите курсор или перейдите к занятию клавишей Tab, чтобы увидеть подробности.</p>
+  <div class="route-layout">
+    <ol class="route-stops" aria-label="Занятия за день">
+      {% for lesson in route_lessons %}<li><a class="route-stop{% if forloop.first %} is-active{% endif %}" href="{{ lesson.detail_url }}" data-route-stop="{{ forloop.counter0 }}">
+        <span class="route-time">{{ lesson.starts_at|date:"H:i" }}</span><span class="route-name">{{ lesson.subject }}</span><span class="route-room">{% if lesson.old_room %}Перенос: {% endif %}{{ lesson.room }}</span>
+      </a></li>{% endfor %}
+    </ol>
+    <div class="route-previews">
+      {% for lesson in route_lessons %}<article class="route-preview{% if forloop.first %} is-active{% endif %}" data-route-preview="{{ forloop.counter0 }}"{% if not forloop.first %} hidden{% endif %}>
+        <p class="route-kicker">{{ forloop.counter }} из {{ route_lessons|length }} · {{ lesson.starts_at|date:"H:i" }}–{{ lesson.ends_at|date:"H:i" }}</p>
+        <h3>{{ lesson.subject }}</h3><p>{{ lesson.teacher }}</p>
+        {% if lesson.old_room %}<p class="route-move">Новая аудитория — <strong>{{ lesson.room }}</strong><br>Прежняя аудитория — {{ lesson.old_room }}</p>
+        {% else %}<p class="route-location">Аудитория <strong>{{ lesson.room }}</strong></p>{% endif %}
+        <a class="quiet-action" href="{{ lesson.detail_url }}">Открыть в расписании →</a>
+      </article>{% endfor %}
+    </div>
+  </div>
+  {% else %}<p class="route-empty">Занятий пока нет. Можно спокойно посмотреть задания и объявления.</p>{% endif %}
 </section>
-{% endif %}
 </div>
 {% endblock %}

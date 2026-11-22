@@ -72,6 +72,14 @@ class AcademicSectionsTests(TestCase):
         self.assertEqual(following["date"], "2026-11-21")
         self.assertEqual(following["days"][0]["lessons"][0].group_name, self.b.group_name)
 
+    def test_day_route_uses_next_teaching_day_on_sunday(self):
+        self.clock.return_value = datetime(2026, 11, 22, 9, tzinfo=dt_timezone.utc)
+        page = self.client.get("/")
+        self.assertEqual(page.context["route_day"], date(2026, 11, 23))
+        self.assertEqual(len(page.context["route_lessons"]), 3)
+        self.assertContains(page, "Маршрут занятий")
+        self.assertContains(page, 'data-route-stop="0"')
+
     def test_moscow_midnight_includes_only_correct_week(self):
         local_midnight = timezone.make_aware(datetime(2026, 11, 23))
         for offset in (-30, 0):
