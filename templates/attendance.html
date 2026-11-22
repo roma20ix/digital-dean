@@ -2,12 +2,53 @@
 {% block title %}Посещаемость{% endblock %}
 {% block content %}
 <h1>Посещаемость</h1>
-<p class="byline">По завершённым занятиям. Процент учитывает пары с отметкой.</p>
-{% for course in courses %}
-<details class="att-course card">
-  <summary><span>{{ course.subject }}</span><span class="att-score">{% if course.marked %}{{ course.present }} из {{ course.marked }} · {{ course.percent }}%{% else %}Нет отметок{% endif %}</span></summary>
-  <ul>{% for entry in course.entries %}<li><a href="{{ entry.lesson.detail_url }}">{{ entry.lesson.starts_at|date:"j E, H:i" }}</a>
-    <span>{% if entry.mark == None %}Без отметки{% elif entry.mark %}Присутствие{% else %}Пропуск{% endif %}</span></li>{% endfor %}</ul>
-</details>
-{% empty %}<p>Завершённых занятий пока нет.</p>{% endfor %}
+{% if courses %}
+<section class="card attendance-overview" aria-labelledby="attendance-overview">
+  {% if totals.marked %}
+    <div class="attendance-ring" style="--rate: {{ totals.percent }}%">
+      <strong>{{ totals.percent }}%</strong>
+    </div>
+  {% endif %}
+  <div>
+    <h2 id="attendance-overview">Общая посещаемость</h2>
+    <p class="meta">{% if totals.marked %}Доля посещённых занятий среди занятий с отметкой.{% else %}По завершённым занятиям пока нет отметок.{% endif %}</p>
+    <dl class="attendance-totals">
+      <div><dt>Посещено</dt><dd>{{ totals.present }}</dd></div>
+      <div><dt>Пропущено</dt><dd>{{ totals.absent }}</dd></div>
+      <div><dt>Без отметки</dt><dd>{{ totals.unmarked }}</dd></div>
+    </dl>
+  </div>
+</section>
+<section class="attendance-courses" aria-labelledby="attendance-courses">
+  <h2 id="attendance-courses">По дисциплинам</h2>
+  {% for course in courses %}
+  <details class="att-course card">
+    <summary>
+      <span class="att-name">{{ course.subject }}</span>
+      <span class="att-score">
+        {% if course.marked %}
+          <progress max="{{ course.marked }}" value="{{ course.present }}" aria-label="Посещено: {{ course.subject }}"></progress>
+          <span>{{ course.present }} из {{ course.marked }} · {{ course.percent }}%</span>
+        {% else %}
+          Нет отметок
+        {% endif %}
+      </span>
+      {% include "components/icon.html" with name="chevron" %}
+    </summary>
+    <ul>
+      {% for entry in course.entries %}
+      <li>
+        <a href="{{ entry.lesson.detail_url }}">{{ entry.lesson.starts_at|date:"j E, H:i" }}</a>
+        {% if entry.mark == None %}<span class="att-status">Без отметки</span>
+        {% elif entry.mark %}<span class="att-status present">Присутствие</span>
+        {% else %}<span class="att-status absent">Пропуск</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </details>
+  {% endfor %}
+</section>
+{% else %}
+<p class="card">Завершённых занятий пока нет.</p>
+{% endif %}
 {% endblock %}

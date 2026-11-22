@@ -48,7 +48,24 @@ if (bell) {
     }
   });
   drawer.addEventListener("click", event => {
-    if (event.target === drawer && event.clientX < drawer.getBoundingClientRect().left) drawer.close();
+    if (event.target !== drawer) return;
+    const {left, right, top, bottom} = drawer.getBoundingClientRect();
+    if (event.clientX < left || event.clientX > right || event.clientY < top || event.clientY > bottom) {
+      drawer.close();
+    }
+  });
+}
+
+const mobileMenu = document.querySelector(".menu");
+if (mobileMenu) {
+  document.addEventListener("click", event => {
+    if (mobileMenu.open && !mobileMenu.contains(event.target)) mobileMenu.open = false;
+  });
+  mobileMenu.addEventListener("keydown", event => {
+    if (event.key === "Escape" && mobileMenu.open) {
+      mobileMenu.open = false;
+      mobileMenu.querySelector("summary").focus();
+    }
   });
 }
 

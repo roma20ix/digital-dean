@@ -28,12 +28,13 @@ def my_tasks(user):
 @require_GET
 @student_only
 def catalog(request):
-    category = request.GET.get("category", "")
-    courses = my_courses(request.user)
-    if category:
-        courses = courses.filter(category=category)
+    categories = (CourseResult.Category.REQUIRED, CourseResult.Category.ELECTIVE)
+    category = request.GET.get("category")
+    if category not in categories:
+        category = CourseResult.Category.REQUIRED
+    courses = my_courses(request.user).filter(category=category)
     return render(request, "learning/catalog.html", {
-        "courses": courses, "category": category, "categories": CourseResult.Category.choices,
+        "courses": courses, "category": category, "categories": categories,
     })
 
 

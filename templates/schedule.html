@@ -16,7 +16,7 @@
     </div>
   </div>
   <div class="calendar-caption"><strong>{{ days.0.date|date:"F Y" }}</strong><span>Занятий: {{ lesson_count }} · {{ teaching_minutes }} мин</span></div>
-  <a class="calendar-today" href="?mode={{ mode }}&amp;date={% now 'Y-m-d' %}">К текущей дате</a>
+  <a class="calendar-today quiet-action" href="?mode={{ mode }}&amp;date={% now 'Y-m-d' %}">К текущей дате</a>
   {% if mode == "week" %}<div class="week-scroll" tabindex="0" aria-label="Расписание недели"><div class="week-grid">{% endif %}
   {% for day in days %}
     <section class="day" data-column="{{ forloop.counter }}">
@@ -37,6 +37,6 @@
     </section>
   {% endfor %}
   {% if mode == "week" %}</div></div>{% endif %}
-  {% if next_teaching_url %}<a href="{{ next_teaching_url }}">Ближайший учебный день с занятиями</a>{% endif %}
+  {% if next_teaching_url %}<a class="quiet-action" href="{{ next_teaching_url }}">Ближайший учебный день с занятиями</a>{% endif %}
 </div>
 {% endblock %}

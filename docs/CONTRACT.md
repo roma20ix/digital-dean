@@ -32,12 +32,12 @@
 
 ### Дополнения кабинета студента
 
-- GET /attendance/ (attendance) показывает завершённые занятия текущей группы и персональные отметки студента. Процент считается по отмеченным занятиям.
+- GET /attendance/ (attendance) показывает завершённые занятия текущей группы и персональные отметки студента. Контекст содержит итоги `totals` и разбивку `courses`. Общий процент и процент по дисциплине рассчитываются по занятиям с отметкой.
 - GET /media/ (media) объединяет ленту деканата и публичные ресурсы для учёбы.
 - POST /inbox/panel/ (notice_panel) открывает панель, возвращает видимые текущему студенту сообщения и отмечает показанные прочитанными. Нужен CSRF.
 - Расписание передаёт lesson_count и teaching_minutes для выбранного периода. Заголовок кабинета получает avatar_initials и has_unread для текущей сессии.
 
-- POST /profile/ принимает связанную форму с accent, необязательным изображением photo и флагом remove. GET /profile/avatar/ отдаёт обработанное изображение текущего пользователя. Профиль и цвет оформления привязаны к аккаунту.
+- POST /profile/ принимает форму с необязательным изображением photo и флагом remove. GET /profile/avatar/ отдаёт обработанное изображение текущего пользователя.
 - При наличии EmployeeProfile главная показывает преподавателю ближайшие собственные занятия, а расписание отбирает занятия по связи instructor. У сотрудника отдельные поля профиля (должность и кафедра). Доступ к студенческим разделам ограничен на сервере.
 
 ### Курсы и задания
@@ -46,7 +46,7 @@
 
 | Имя и путь | Метод | Шаблон и данные |
 |---|---|---|
-| course_catalog · /study/courses/ | GET | learning/catalog.html · courses, categories, category. Фильтр category принимает required, elective, audit или internal. |
+| course_catalog · /study/courses/ | GET | learning/catalog.html · courses, categories, category. В каталоге доступны required и elective. По умолчанию открывается required. |
 | course_detail · /study/courses/<pk>/ | GET | learning/course.html · course, weeks с tasks, points, maximum, remaining, scaled, nearest. Вкладка tab=recordings открывает recordings. |
 | course_material · /study/materials/<pk>/ | GET | learning/material.html · week и course. Обратный переход ведёт на #week-ID. |
 | task_list · /study/tasks/ | GET | learning/tasks.html · groups по московской неделе с понедельника. Фильтры course и status принимают несколько значений, между фильтрами применяется «и». |

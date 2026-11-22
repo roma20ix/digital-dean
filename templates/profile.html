@@ -22,17 +22,13 @@
   </dl>
 </section>
 <section class="card">
-  <h2>Оформление кабинета</h2>
+  <h2>Фото профиля</h2>
   {% if request.GET.saved and not appearance_form.is_bound %}<p role="status">Настройки сохранены.</p>{% endif %}
   <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data" class="stack personal-form">
     {% csrf_token %}
     <div>{{ appearance_form.photo.label_tag }}{{ appearance_form.photo }}
       <small>JPG, PNG или WebP до 4 МБ. Изображение будет обрезано по центру.</small>{{ appearance_form.photo.errors }}</div>
     {% if has_avatar %}<label class="check">{{ appearance_form.remove }} Вернуть инициалы</label>{% endif %}
-    <fieldset class="accents"><legend>Акцентный цвет</legend>
-      <div>{% for option in appearance_form.accent %}<label class="swatch">{{ option.tag }} {{ option.choice_label }}</label>{% endfor %}</div>
-      {{ appearance_form.accent.errors }}
-    </fieldset>
     <button class="primary">Сохранить изменения</button>
   </form>
 </section>

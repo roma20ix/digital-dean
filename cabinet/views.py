@@ -83,18 +83,15 @@ def today(request):
 @require_http_methods(["GET", "POST"])
 def profile(request):
     employee = getattr(request.user, "employeeprofile", None)
-    appearance = Appearance.objects.filter(user=request.user).values("accent").first()
     if request.method == "POST":
         form = AppearanceForm(request.POST, request.FILES)
     else:
-        form = AppearanceForm(initial=appearance or {"accent": "ocean"})
+        form = AppearanceForm()
     if form.is_bound and form.is_valid():
-        values = {"accent": form.cleaned_data["accent"]}
         if form.cleaned_data["photo"]:
-            values["avatar"] = form.cleaned_data["photo"]
+            Appearance.objects.update_or_create(user=request.user, defaults={"avatar": form.cleaned_data["photo"]})
         elif form.cleaned_data["remove"]:
-            values["avatar"] = None
-        Appearance.objects.update_or_create(user=request.user, defaults=values)
+            Appearance.objects.filter(user=request.user).update(avatar=None)
         return redirect(reverse("profile") + "?saved=1")
     return render(request, "profile.html", {"student": student_context(request.user),
                                            "employee": employee, "appearance_form": form})
@@ -212,11 +209,11 @@ def cabinet_header(request):
     if not request.user.is_authenticated:
         return {}
     employee = getattr(request.user, "employeeprofile", None)
-    appearance = Appearance.objects.filter(user=request.user).values_list("accent", Q(avatar__isnull=True)).first()
+    has_avatar = Appearance.objects.filter(user=request.user, avatar__isnull=False).exists()
     student = employee or student_context(request.user)
     name = student.full_name if isinstance(student, (EmployeeProfile, StudentProfile)) else student["full_name"]
-    return {"employee_account": employee, "profile_accent": appearance[0] if appearance else "ocean",
-            "has_avatar": bool(appearance and not appearance[1]), "avatar_initials": "".join(part[0] for part in name.split()[:2]).upper(),
+    return {"employee_account": employee, "has_avatar": has_avatar,
+            "avatar_initials": "".join(part[0] for part in name.split()[:2]).upper(),
             "has_unread": not employee and student_notices(request.user, timezone.now()).filter(is_read=False).exists()}
 
 
@@ -246,10 +243,17 @@ def attendance(request):
         if mark is not None:
             course["marked"] += 1
             course["present"] += int(mark)
+    totals = {"present": 0, "absent": 0, "unmarked": 0, "marked": 0}
     for course in courses.values():
+        course["absent"] = course["marked"] - course["present"]
+        course["unmarked"] = len(course["entries"]) - course["marked"]
         if course["marked"]:
             course["percent"] = round(100 * course["present"] / course["marked"])
-    return render(request, "attendance.html", {"courses": courses.values()})
+        for key in totals:
+            totals[key] += course[key]
+    if totals["marked"]:
+        totals["percent"] = round(100 * totals["present"] / totals["marked"])
+    return render(request, "attendance.html", {"courses": courses.values(), "totals": totals})
 
 
 @never_cache

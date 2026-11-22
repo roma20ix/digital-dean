@@ -1,21 +1,18 @@
 .learning { max-width: 75rem; }
-.learning-nav, .pills, .actions, .course-meta, .course-foot { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
-.learning-nav { padding-bottom: .75rem; border-bottom: 1px solid var(--line); margin-bottom: clamp(1.25rem, 3vw, 2.3rem); }
+.learning-nav, .pills, .actions, .course-foot { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.learning-nav { padding-bottom: .75rem; border-bottom: 1px solid var(--line); margin-bottom: clamp(1rem, 2vw, 1.65rem); }
 .learning-nav a, .pills a { width: auto; margin: 0; }
 .pills { margin-bottom: 1rem; }
 .pills a { min-height: 2.5rem; border: 1px solid var(--line); background: var(--surface); border-radius: 2rem; padding: .4rem .9rem; font-size: .9rem; }
-.pills [aria-current] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.pills [aria-current] { background: var(--selected); color: var(--accent); border-color: var(--accent); }
 .learning h1 { margin-bottom: 1.3rem; }
 .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .85rem; }
-.course-card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; min-height: 9.7rem; color: var(--ink); text-decoration: none; }
+.course-card { background: var(--surface); border: 1px solid var(--line); border-radius: 1rem; padding: 1.15rem; display: flex; flex-direction: column; min-height: 8.4rem; color: var(--ink); text-decoration: none; }
 .course-card:hover { border-color: var(--accent); }
 .course-card:hover h2 { text-decoration: underline; }
-.course-meta, .course-foot, .learning small { color: var(--muted); font-size: .85rem; }
+.course-foot, .learning small { color: var(--muted); font-size: .85rem; }
 .course-card h2 { margin: .85rem 0 1.3rem; }
 .course-foot { margin-top: auto; justify-content: space-between; }
-.cat-internal .tile-icon { color: var(--success); background: var(--success-bg); }
-.cat-elective .tile-icon { color: light-dark(#734d21, #f4cf90); background: light-dark(#faeed9,#483c2e); }
-.cat-audit .tile-icon { color: light-dark(#62418c, #d5c1ff); background: light-dark(#eee7f8,#393247); }
 .back { display: inline-block; margin-bottom: 1rem; }
 .course-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15rem, .46fr); gap: 1rem; align-items: start; }
 .course-layout > * { min-width: 0; }

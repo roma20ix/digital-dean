@@ -59,6 +59,17 @@ class LearningTests(TestCase):
             catalog = self.client.get(reverse("course_catalog"), {"category": "elective"})
             self.assertEqual([c.category for c in catalog.context["courses"]], ["elective"])
 
+    def test_catalog_shows_only_required_and_elective_sections(self):
+        url = reverse("course_catalog")
+        for category in ("", "audit", "internal"):
+            with self.subTest(category=category):
+                response = self.client.get(url, {"category": category})
+                self.assertEqual(response.context["category"], CourseResult.Category.REQUIRED)
+                self.assertEqual(set(c.category for c in response.context["courses"]), {CourseResult.Category.REQUIRED})
+                self.assertContains(response, "Факультативные")
+                self.assertNotContains(response, "Вольнослушатель")
+                self.assertNotContains(response, "Внутренние")
+
     def test_home_shows_exam_registration_when_it_is_due_next(self):
         self.clock.return_value = NOW.replace(day=29)
         home = self.client.get("/")

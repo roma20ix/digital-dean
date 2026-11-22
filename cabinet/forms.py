@@ -6,7 +6,7 @@ from django.core.signing import BadSignature, Signer
 
 from PIL import Image, ImageOps
 
-from .models import Appearance, StudentRequest
+from .models import StudentRequest
 
 
 class RequestForm(forms.Form):
@@ -36,7 +36,6 @@ class RequestForm(forms.Form):
 
 
 class AppearanceForm(forms.Form):
-    accent = forms.ChoiceField(label="Акцентный цвет", choices=Appearance.COLORS, widget=forms.RadioSelect)
     photo = forms.FileField(label="Новое изображение", required=False,
                             widget=forms.FileInput(attrs={"accept": "image/jpeg,image/png,image/webp"}))
     remove = forms.BooleanField(label="Вернуть инициалы", required=False)
