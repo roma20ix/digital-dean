@@ -25,6 +25,7 @@ class AcademicDemo(StaticLiveServerTestCase):
                 for width, height in [(360, 740), (1280, 800)]:
                     page = browser.new_page(viewport={"width": width, "height": height})
                     page.goto(self.live_server_url + "/login/")
+                    expect(page.get_by_text("Конкурсный прототип · вымышленные данные")).to_be_visible()
                     page.locator('[name=username]').fill("student_a")
                     page.locator('[name=password]').fill(password)
                     page.locator('[name=password]').press("Enter")
@@ -60,12 +61,24 @@ class AcademicDemo(StaticLiveServerTestCase):
                     capture("day")
                     page.get_by_role("link", name="Неделя", exact=True).press("Enter")
                     expect(page.locator(".day")).to_have_count(7)
+                    if width == 360:
+                        self.assertTrue(page.locator(".week-scroll").evaluate("el => el.scrollWidth === el.clientWidth"))
                     capture("week")
                     page.goto(self.live_server_url + "/study/")
-                    for text in ("Оценки пока нет", "Зачтено", "5", "Сессия", "2 декабря 2026, 10:00"):
-                        expect(page.get_by_text(text, exact=(text == "5"))).to_be_visible()
+                    results = page.locator(".result[id^='course-']")
+                    for course, grade in (("Статистика", "Оценки пока нет"),
+                                          ("Академическое письмо", "Зачтено"),
+                                          ("Линейная алгебра", "9 / 10")):
+                        expect(results.filter(has=page.get_by_role("heading", name=course, exact=True))).to_contain_text(grade)
+                    expect(page.get_by_role("heading", name="Сессия")).to_be_visible()
+                    expect(page.get_by_text("2 декабря 2026, 10:00")).to_be_visible()
                     capture("study")
                     if width == 1280:
+                        page.goto(self.live_server_url + "/attendance/")
+                        row = page.locator(".att-course > summary").filter(has_text="Линейная алгебра")
+                        row.hover()
+                        radius = row.evaluate("el => parseFloat(getComputedStyle(el).borderTopLeftRadius)")
+                        self.assertGreater(radius, 0)
                         page.goto(self.live_server_url + "/inbox/")
                         article = page.get_by_role("article").filter(has=change)
                         article.get_by_role("button").press("Enter")

@@ -45,6 +45,7 @@
     {% if user.is_authenticated %}<aside class="rail"><div class="rail-inner"><button class="rail-toggle" type="button" hidden aria-expanded="true" aria-label="Свернуть меню" title="Свернуть меню">{% include "components/icon.html" with name="collapse" %}<span>Свернуть меню</span></button>{% include "components/navigation.html" %}</div></aside>{% endif %}
     <div class="workspace">
       <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+      <footer class="prototype-note">Конкурсный прототип · вымышленные данные</footer>
     </div>
   </div>
 </body>

@@ -17,7 +17,7 @@
   </div>
   <div class="calendar-caption"><strong>{{ days.0.date|date:"F Y" }}</strong><span>Занятий: {{ lesson_count }} · {{ teaching_minutes }} мин</span></div>
   <a class="calendar-today quiet-action" href="?mode={{ mode }}&amp;date={% now 'Y-m-d' %}">К текущей дате</a>
-  {% if mode == "week" %}<div class="week-scroll" tabindex="0" aria-label="Расписание недели"><div class="week-grid">{% endif %}
+  {% if mode == "week" %}<div class="week-scroll" role="region" aria-label="Расписание недели"><div class="week-grid">{% endif %}
   {% for day in days %}
     <section class="day" data-column="{{ forloop.counter }}">
       {% if mode == "week" %}<h2 class="week-heading"><a href="?mode=day&amp;date={{ day.date|date:'Y-m-d' }}">{{ day.date|date:"D, j" }}</a></h2>{% else %}<h2 class="section-heading">{% include "components/icon.html" with name="schedule" %}{{ day.date|date:"l, j E" }}</h2>{% endif %}
