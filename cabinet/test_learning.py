@@ -46,6 +46,9 @@ class LearningTests(TestCase):
             task = self.client.get(nearest.target_url).context["task"]
             course = task.week.course
             self.assertEqual((course.title, course.student), (topic, student))
+            home = self.client.get("/")
+            self.assertEqual(home.context["goal_course"], course)
+            self.assertContains(home, f'{reverse("course_detail", args=[course.pk])}#goal-planner')
             page = self.client.get(reverse("course_detail", args=[course.pk]))
             self.assertEqual((page.context["points"], page.context["remaining"], page.context["maximum"]),
                              (points, 30, 40))
