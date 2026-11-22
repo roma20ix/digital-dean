@@ -10,11 +10,11 @@
   <script defer src="{% static 'workspace.js' %}"></script>
   {% block styles %}{% endblock %}
 </head>
-<body data-accent="{{ profile_accent|default:'ocean' }}">
+<body>
   {% include "components/symbols.html" %}
   <a class="skip" href="#main">Перейти к содержанию</a>
   <header class="mast">
-    <strong class="brand"><span class="brand-mark" aria-hidden="true"></span>Цифровой деканат</strong>
+    <a class="brand" href="{% url 'today' %}"><span class="brand-mark" aria-hidden="true"></span>Цифровой деканат</a>
     <div class="tools">
       <div class="theme-picker" hidden>
         <button class="theme-trigger" type="button" popovertarget="theme-options" aria-label="Тема оформления">{% include "components/icon.html" with name="theme" %}<span>Как в системе</span></button>
@@ -25,7 +25,10 @@
       {% if user.is_authenticated %}
         {% if not employee_account %}<a class="bell" href="{% url 'inbox' %}" aria-label="{% if has_unread %}Есть новые уведомления{% else %}Открыть уведомления{% endif %}" data-panel="{% url 'notice_panel' %}">{% include "components/icon.html" with name="inbox" %}{% if has_unread %}<i></i>{% endif %}</a>{% endif %}
         <a class="avatar" href="{% url 'profile' %}" aria-label="Мой профиль">{% include "components/avatar.html" %}</a>
-        <details class="menu"><summary>Меню</summary>{% include "components/navigation.html" %}</details>
+        <details class="menu">
+          <summary aria-label="Меню">{% include "components/icon.html" with name="menu" %}</summary>
+          {% include "components/navigation.html" %}
+        </details>
       {% endif %}
     </div>
   </header>
@@ -33,14 +36,13 @@
   <dialog class="drawer" aria-labelledby="drawer-heading">
     <div class="drawer-head"><h2 id="drawer-heading">Уведомления</h2><form method="dialog"><button aria-label="Закрыть">×</button></form></div>
     <div class="drawer-content" aria-live="polite"></div>
-    <a href="{% url 'inbox' %}">Вся лента →</a>
+    <div class="drawer-footer"><a class="quiet-action" href="{% url 'inbox' %}">Вся лента {% include "components/icon.html" with name="arrow" %}</a></div>
   </dialog>
   {% endif %}
   <div class="shell {% if not user.is_authenticated %}guest{% endif %}">
     {% if user.is_authenticated %}<aside class="rail"><div class="rail-inner"><button class="rail-toggle" type="button" hidden aria-expanded="true" aria-label="Свернуть меню" title="Свернуть меню">{% include "components/icon.html" with name="collapse" %}<span>Свернуть меню</span></button>{% include "components/navigation.html" %}</div></aside>{% endif %}
     <div class="workspace">
       <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
-      <footer>Конкурсный прототип · вымышленные данные</footer>
     </div>
   </div>
 </body>

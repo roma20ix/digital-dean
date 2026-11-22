@@ -146,13 +146,19 @@ class AcademicSectionsTests(TestCase):
 
     def test_attendance_uses_own_marks_and_excludes_unmarked(self):
         from .models import Attendance
-        past = Lesson.objects.filter(group_name=self.a.group_name, ends_at__lt=timezone.now()).first()
+        past, missed = Lesson.objects.filter(group_name=self.a.group_name, ends_at__lt=timezone.now())[:2]
         Attendance.objects.filter(student=self.a).delete()
         Attendance.objects.update_or_create(student=self.b, lesson=past, defaults={"present": False})
-        courses = self.client.get(reverse("attendance")).context["courses"]
+        response = self.client.get(reverse("attendance"))
+        courses = response.context["courses"]
         self.assertTrue(courses)
         self.assertTrue(all(course["marked"] == 0 for course in courses))
+        self.assertNotContains(response, "attendance-ring")
         Attendance.objects.create(student=self.a, lesson=past, present=True)
+        Attendance.objects.create(student=self.a, lesson=missed, present=False)
         response = self.client.get(reverse("attendance"))
-        self.assertContains(response, "100%")
+        self.assertContains(response, "50%")
+        totals = response.context["totals"]
+        self.assertEqual((totals["present"], totals["absent"], totals["percent"]), (1, 1, 50))
+        self.assertGreater(totals["unmarked"], 0)
         self.assertNotContains(response, "Гражданское право")

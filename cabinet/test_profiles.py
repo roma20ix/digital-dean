@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.utils import timezone
 from PIL import Image
 
-from .models import Lesson
+from .models import Appearance, Lesson
 
 
 class EmployeeAndAppearanceTests(TestCase):
@@ -40,13 +40,17 @@ class EmployeeAndAppearanceTests(TestCase):
             counts = Counter(timezone.localdate(start) for start in starts)
             self.assertEqual(set(counts.values()), {3})
 
-    def test_avatar_and_preferences_belong_to_session_owner(self):
+    def test_avatar_belongs_to_session_owner(self):
         self.client.force_login(self.student)
-        self.assertFalse(self.client.get("/profile/").context["appearance_form"].is_bound)
+        Appearance.objects.create(user=self.student, accent="forest")
+        profile = self.client.get("/profile/")
+        self.assertFalse(profile.context["appearance_form"].is_bound)
+        self.assertNotContains(profile, "Акцентный цвет")
+        self.assertNotContains(profile, "data-accent")
         data = BytesIO()
         Image.new("RGB", (400, 600), "teal").save(data, format="PNG")
         image = SimpleUploadedFile("test.png", data.getvalue(), "image/png")
-        self.assertRedirects(self.client.post("/profile/", {"accent": "forest", "photo": image}), "/profile/?saved=1")
+        self.assertRedirects(self.client.post("/profile/", {"photo": image}), "/profile/?saved=1")
         self.assertContains(self.client.get("/profile/?saved=1"), "Настройки сохранены.")
         self.client.logout()
         self.client.force_login(self.student)
@@ -54,10 +58,9 @@ class EmployeeAndAppearanceTests(TestCase):
         self.assertEqual(response["Content-Type"], "image/jpeg")
         self.assertEqual(Image.open(BytesIO(response.content)).size, (256, 256))
         invalid = SimpleUploadedFile("broken.png", b"invalid", "image/png")
-        self.assertContains(self.client.post("/profile/", {"photo": invalid, "accent": "amber"}), "исправное изображение")
-        self.assertContains(self.client.get("/"), 'data-accent="forest"')
+        self.assertContains(self.client.post("/profile/", {"photo": invalid}), "исправное изображение")
         self.client.force_login(get_user_model().objects.get(username="student_b"))
         self.assertEqual(self.client.get("/profile/avatar/", {"user": self.student.pk}).status_code, 404)
         self.client.force_login(self.student)
-        self.client.post("/profile/", {"accent": "ocean", "remove": "on"})
+        self.client.post("/profile/", {"remove": "on"})
         self.assertEqual(self.client.get("/profile/avatar/").status_code, 404)

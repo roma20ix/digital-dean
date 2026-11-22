@@ -5,8 +5,8 @@
   background: var(--selected);
   border-color: var(--line);
 }
-.lesson-copy { position: relative; width: 67%; min-height: 11rem; display: flex; flex-direction: column; justify-content: center; }
-.lesson .illustration { left: 62%; background-image: radial-gradient(light-dark(#8fb4bc,#5c7e86) 1px, transparent 1px); mask-image: linear-gradient(to right, transparent, black 18%); }
+.lesson-copy { position: relative; width: 67%; min-height: 8.75rem; display: flex; flex-direction: column; justify-content: center; }
+.lesson .illustration { left: 62%; background-image: radial-gradient(light-dark(#b7acd8,#75678b) 1px, transparent 1px); mask-image: linear-gradient(to right, transparent, black 18%); }
 .band { display: flex; align-items: center; gap: .55rem; color: var(--accent); font-size: .9rem; letter-spacing: .01em; }
 .pad h3 { margin: .35rem 0; font-size: clamp(1.4rem, 2.8vw, 2.25rem); letter-spacing: -.04em; }
 .pad h3 a, .entry a, .card-title + a:not(.primary) { color: var(--ink); font-weight: 650; text-decoration: none; }
@@ -17,15 +17,14 @@
 .move strong { margin-inline: .25rem; }
 .card-title { flex-direction: column; align-items: flex-start; gap: .85rem; margin-bottom: .85rem; }
 .tile-icon { display: inline-grid; place-items: center; width: 2.3rem; height: 2.3rem; background: var(--selected); color: var(--accent); border-radius: .7rem; }
-.requests .tile-icon { background: var(--success-bg); color: var(--success); }
-.dashboard .card:nth-child(3) .tile-icon { color: light-dark(#925827, #fac699); background: light-dark(#fff0df,#49362d); }
 .dashboard .meta, .dashboard .card-title ~ p { margin-top: .5rem; color: var(--muted); font-size: .89rem; }
 .dashboard .ruled { margin-bottom: .3rem; }
 .calendar-tools, .paging, .modes { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .calendar-tools { justify-content: space-between; margin: 1rem 0; }
-.paging { gap: 1rem; }
-.paging a, .modes a { font-weight: 550; text-decoration: none; padding: .55rem .75rem; }
-.paging a:hover { text-decoration: underline; }
+.paging { gap: .4rem; }
+.paging a, .modes a { font-weight: 550; text-decoration: none; padding: .4rem .65rem; }
+.paging a, .week-heading a { border-radius: .4rem; }
+.paging a:hover, .week-heading a:hover { background: var(--selected); color: var(--accent); }
 .modes { background: var(--subtle); padding: .2rem; border-radius: .75rem; }
 .modes a { color: var(--muted); border-radius: .55rem; }
 .modes [aria-current] { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px #12142c19; }
@@ -64,16 +63,16 @@
   .band { margin-right: 4rem; min-height: 1.7rem; }
   .card-title { flex-direction: row; align-items: center; }
 }
-.calendar-today { display: inline-block; margin-bottom: .8rem; }
+.calendar-today { margin: .45rem 0 .8rem; }
 .week-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: .85rem; margin-bottom: 1rem; background: var(--surface); }
 .week-grid { display: grid; grid-template-columns: repeat(7,minmax(7.25rem,1fr)); }
 .week-grid.aligned { grid-template-columns: 3.5rem repeat(7,minmax(7.25rem,1fr)); }
 .week-grid .day { margin: 0; border: 0; border-radius: 0; padding: .4rem; }
 .week-grid.aligned .day { display: contents; }
 .week-heading, .week-grid .axis { margin: 0; padding: .7rem .45rem; background: var(--subtle); font-size: .86rem; }
-.week-heading a { color: var(--ink); }
+.week-heading a { display: block; padding: .2rem .35rem; text-decoration: none; }
 .week-grid .axis { grid-column: 1; position: sticky; left: 0; font-variant-numeric: tabular-nums; z-index: 1; }
-.week-grid .period { display: block; min-width: 0; margin: .25rem; padding: .6rem; border: 0; border-left: 3px solid var(--accent); border-radius: .4rem; background: var(--selected); font-size: .82rem; }
+.week-grid .period { display: block; min-width: 0; margin: .25rem; padding: .6rem; border: 0; border-radius: .65rem; background: var(--selected); font-size: .82rem; }
 .week-grid .period h3, .week-grid .time { font-size: .85rem; }
 .week-grid .day > p { margin: .4rem; color: var(--muted); font-size: .78rem; }
 .calendar-caption { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: baseline; }
@@ -81,5 +80,5 @@
 .calendar-caption span { color: var(--muted); font-size: .9rem; }
 
 .week-grid .axis { white-space: nowrap; font-size: .8rem; }
-.week-grid h3 a { color: var(--ink); text-underline-offset: .15em; }
+.week-grid h3 a { color: var(--ink); text-decoration-color: var(--muted); }
 .daily-agenda { margin-top: 1rem; }
