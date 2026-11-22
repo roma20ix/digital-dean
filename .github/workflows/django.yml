@@ -37,3 +37,9 @@ jobs:
           } finally {
             Stop-Process -Id $server.Id
           }
+      - name: Учебные сценарии в Chromium
+        if: runner.os == 'Linux'
+        run: |
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+          python manage.py test tests.ui.learning

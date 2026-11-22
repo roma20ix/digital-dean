@@ -5,29 +5,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Личный кабинет{% endblock %} · Цифровой деканат</title>
+  <script src="{% static 'theme.js' %}"></script>
   <link rel="stylesheet" href="{% static 'cabinet.css' %}">
+  <script defer src="{% static 'workspace.js' %}"></script>
   {% block styles %}{% endblock %}
 </head>
-<body>
+<body data-accent="{{ profile_accent|default:'ocean' }}">
+  {% include "components/symbols.html" %}
   <a class="skip" href="#main">Перейти к содержанию</a>
-  <header class="mast"><div class="wrap mast-inner">
-    <strong class="brand">Цифровой деканат</strong>
-    {% if user.is_authenticated %}
-      <details class="menu">
-        <summary>Меню</summary>
-        <nav aria-label="Разделы кабинета">
-          <a href="{% url 'today' %}">Сегодня</a>
-          <a href="{% url 'schedule' %}">Расписание</a>
-          <a href="{% url 'study' %}">Учёба</a>
-          <a href="{% url 'requests' %}">Мои заявки</a>
-          <a href="{% url 'inbox' %}">Уведомления</a>
-          <a href="{% url 'profile' %}">Профиль</a>
-          <form action="{% url 'logout' %}" method="post">{% csrf_token %}<button class="logout">Выйти</button></form>
-        </nav>
-      </details>
-    {% endif %}
-  </div></header>
-  <main class="wrap" id="main" tabindex="-1">{% block content %}{% endblock %}</main>
-  <footer class="wrap">Конкурсный прототип · вымышленные данные</footer>
+  <header class="mast">
+    <strong class="brand"><span class="brand-mark" aria-hidden="true"></span>Цифровой деканат</strong>
+    <div class="tools">
+      <div class="theme-picker" hidden>
+        <button class="theme-trigger" type="button" popovertarget="theme-options" aria-label="Тема оформления">{% include "components/icon.html" with name="theme" %}<span>Как в системе</span></button>
+        <div id="theme-options" popover aria-label="Выбор темы">
+          <button data-theme="system">Как в системе</button><button data-theme="light">Светлая</button><button data-theme="dark">Тёмная</button>
+        </div>
+      </div>
+      {% if user.is_authenticated %}
+        {% if not employee_account %}<a class="bell" href="{% url 'inbox' %}" aria-label="{% if has_unread %}Есть новые уведомления{% else %}Открыть уведомления{% endif %}" data-panel="{% url 'notice_panel' %}">{% include "components/icon.html" with name="inbox" %}{% if has_unread %}<i></i>{% endif %}</a>{% endif %}
+        <a class="avatar" href="{% url 'profile' %}" aria-label="Мой профиль">{% include "components/avatar.html" %}</a>
+        <details class="menu"><summary>Меню</summary>{% include "components/navigation.html" %}</details>
+      {% endif %}
+    </div>
+  </header>
+  {% if user.is_authenticated and not employee_account %}
+  <dialog class="drawer" aria-labelledby="drawer-heading">
+    <div class="drawer-head"><h2 id="drawer-heading">Уведомления</h2><form method="dialog"><button aria-label="Закрыть">×</button></form></div>
+    <div class="drawer-content" aria-live="polite"></div>
+    <a href="{% url 'inbox' %}">Вся лента →</a>
+  </dialog>
+  {% endif %}
+  <div class="shell {% if not user.is_authenticated %}guest{% endif %}">
+    {% if user.is_authenticated %}<aside class="rail"><div class="rail-inner"><button class="rail-toggle" type="button" hidden aria-expanded="true" aria-label="Свернуть меню" title="Свернуть меню">{% include "components/icon.html" with name="collapse" %}<span>Свернуть меню</span></button>{% include "components/navigation.html" %}</div></aside>{% endif %}
+    <div class="workspace">
+      <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+      <footer>Конкурсный прототип · вымышленные данные</footer>
+    </div>
+  </div>
 </body>
 </html>

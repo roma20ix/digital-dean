@@ -1,0 +1,18 @@
+{% extends "learning/base.html" %}
+{% block title %}Мои курсы{% endblock %}
+{% block learning_content %}
+<h1>Мои курсы</h1>
+<nav class="pills" aria-label="Тип курса">
+  <a href="{% url 'course_catalog' %}" {% if not category %}aria-current="page"{% endif %}>Все</a>
+  {% for key, label in categories %}<a href="?category={{ key }}" {% if key == category %}aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+</nav>
+<div class="course-grid">
+  {% for course in courses %}
+  <a class="course-card cat-{{ course.category }}" href="{% url 'course_detail' course.pk %}">
+    <span class="course-meta"><span class="tile-icon">{% include "components/icon.html" with name="study" %}</span>{{ course.get_category_display }}</span>
+    <h2>{{ course.title }}</h2>
+    <span class="course-foot">{{ course.student.group_name }} · {{ course.assessment_type }} {% include "components/icon.html" with name="arrow" %}</span>
+  </a>
+  {% empty %}<p>В этой категории пока нет курсов.</p>{% endfor %}
+</div>
+{% endblock %}

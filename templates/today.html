@@ -4,11 +4,13 @@
 {% block title %}Сегодня{% endblock %}
 {% block content %}
 <div class="academic home">
-<div class="heading"><h1>Сегодня</h1><span>{% now "j E, l" %}</span></div>
-<p class="byline">{{ student.full_name }}</p>
+<div class="heading"><h1>Сегодня</h1><span class="date-chip">{% include "components/icon.html" with name="schedule" %}{% now "j E, l" %}</span></div>
+<p class="byline">{{ student.full_name }}{% if student.group_name %} · {{ student.group_name }}{% endif %}</p>
 <div class="dashboard">
   <section class="card lesson">
-    <h2 class="band">Ближайшая пара</h2>
+    {% include "components/books.html" %}
+    <div class="lesson-copy">
+    <h2 class="band">{% include "components/icon.html" with name="study" %}Ближайшая пара</h2>
     {% now "Y-m-d" as today_date %}
     {% if next_lesson %}
       {% if next_lesson.starts_at|date:"Y-m-d" > today_date %}<p>На сегодня больше пар нет.</p>{% endif %}
@@ -24,10 +26,11 @@
       </div>
     {% else %}<div class="pad"><p>На сегодня больше пар нет.</p>
       <a href="{% url 'schedule' %}">Открыть расписание</a></div>{% endif %}
+    </div>
   </section>
   <section class="card requests">
-    <h2>Мои заявки</h2>
-    <a class="primary" href="{% url 'request_new' %}">Заказать справку</a>
+    <h2 class="card-title"><span class="tile-icon">{% include "components/icon.html" with name="requests" %}</span>Мои заявки</h2>
+    <a class="primary" href="{% url 'request_new' %}">Заказать справку {% include "components/icon.html" with name="arrow" %}</a>
     {% if latest_request %}
       <p class="ruled">Последняя заявка</p>
       <a href="{{ latest_request.detail_url }}">{{ latest_request.kind_label }} № {{ latest_request.id }}</a>
@@ -35,15 +38,29 @@
     {% else %}<p class="meta">Заявок пока нет.</p>{% endif %}
   </section>
   <section class="card">
-    <h2>Ближайший срок</h2>
-    {% if next_deadline %}<a href="{{ next_deadline.target_url }}">{{ next_deadline.title }}</a><p>{{ next_deadline.due_at|date:"j E, H:i" }}</p>
+    {% with work=next_deadline.work %}
+    <h2 class="card-title"><span class="tile-icon">{% include "components/icon.html" with name="clock" %}</span>{% if work.kind == "homework" %}Ближайшее домашнее задание{% elif work %}{{ work.get_kind_display }}{% else %}Ближайший срок{% endif %}</h2>
+    {% if next_deadline %}
+      <a href="{{ next_deadline.target_url }}">{{ next_deadline.title }}</a>
+      {% if work.kind == "homework" %}<p>{{ work.week.course.title }}</p>{% endif %}
+      <p>{% if work.kind == "homework" %}Сдать до{% elif work.kind == "exam_signup" %}Подтвердить до{% else %}До{% endif %} {{ next_deadline.due_at|date:"j E, H:i" }} МСК</p>
     {% else %}<p>Ближайших сроков пока нет.</p>{% endif %}
+    {% endwith %}
   </section>
   {% if changes %}
-    <section class="card"><h2>Изменения</h2>
+    <section class="card"><h2 class="card-title"><span class="tile-icon">{% include "components/icon.html" with name="change" %}</span>Изменения</h2>
       {% for notice in changes %}<div class="entry"><a href="{{ notice.target_url }}">{{ notice.title }}</a><p>{{ notice.body }}</p></div>{% endfor %}
     </section>
   {% endif %}
 </div>
+{% if today_lessons %}
+<section class="card daily-agenda">
+  <h2>Пары на сегодня</h2>
+  {% for lesson in today_lessons %}<div class="faculty-lesson">
+    <strong>{{ lesson.starts_at|date:"H:i" }} – {{ lesson.ends_at|date:"H:i" }}</strong>
+    <div><a href="{{ lesson.detail_url }}">{{ lesson.subject }}</a><p class="meta">{{ lesson.teacher }} · Аудитория {{ lesson.room }}</p></div>
+  </div>{% endfor %}
+</section>
+{% endif %}
 </div>
 {% endblock %}

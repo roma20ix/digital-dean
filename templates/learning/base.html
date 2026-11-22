@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'academic.css' %}">
+<link rel="stylesheet" href="{% static 'learning.css' %}">
+{% endblock %}
+{% block content %}
+<div class="learning">
+  {% include "learning/navigation.html" %}
+  {% block learning_content %}{% endblock %}
+</div>
+{% endblock %}

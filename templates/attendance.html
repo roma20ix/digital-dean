@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Посещаемость{% endblock %}
+{% block content %}
+<h1>Посещаемость</h1>
+<p class="byline">По завершённым занятиям. Процент учитывает пары с отметкой.</p>
+{% for course in courses %}
+<details class="att-course card">
+  <summary><span>{{ course.subject }}</span><span class="att-score">{% if course.marked %}{{ course.present }} из {{ course.marked }} · {{ course.percent }}%{% else %}Нет отметок{% endif %}</span></summary>
+  <ul>{% for entry in course.entries %}<li><a href="{{ entry.lesson.detail_url }}">{{ entry.lesson.starts_at|date:"j E, H:i" }}</a>
+    <span>{% if entry.mark == None %}Без отметки{% elif entry.mark %}Присутствие{% else %}Пропуск{% endif %}</span></li>{% endfor %}</ul>
+</details>
+{% empty %}<p>Завершённых занятий пока нет.</p>{% endfor %}
+{% endblock %}
