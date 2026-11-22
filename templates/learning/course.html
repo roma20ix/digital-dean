@@ -48,7 +48,11 @@
       <label for="goal-target">Хочу получить <output id="goal-value" for="goal-target">7</output> из 10</label>
       <input id="goal-target" type="range" min="1" max="10" value="7" step="1" aria-describedby="goal-explanation">
       <div class="goal-ticks" aria-hidden="true"><span>1</span><span>5</span><span>10</span></div>
+      <div class="goal-chart" aria-hidden="true"><div class="goal-chart-fill"></div><i class="goal-chart-target"></i></div>
+      <div class="goal-legend"><span><i class="earned"></i>Набрано: {{ points }}</span><span><i class="available"></i>Доступно: {{ remaining }}</span><span><i class="unavailable"></i>Недоступно</span></div>
       <p class="goal-answer" role="status" aria-live="polite"></p>
+      <p class="goal-next"></p>
+      <a class="quiet-action" href="{% url 'task_list' %}?course={{ course.pk }}">Посмотреть задания курса →</a>
       <p class="meta" id="goal-explanation">Расчёт использует только опубликованные задания. Это прогноз, он не меняет оценку в ведомости.</p>
     </section>{% endif %}
     <section class="panel"><h2>Ближайший дедлайн</h2>

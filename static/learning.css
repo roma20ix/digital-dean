@@ -29,6 +29,16 @@
 .goal-planner output { color: var(--accent); font-size: 1.4rem; font-weight: 750; }
 .goal-planner input[type="range"] { display: block; width: 100%; padding: 0; border: 0; background: transparent; accent-color: var(--accent); cursor: pointer; }
 .goal-ticks { display: flex; justify-content: space-between; color: var(--muted); font-size: .8rem; }
+.goal-chart { position: relative; height: 1.25rem; margin: 1.1rem 0 .8rem; border-radius: 1rem; background: var(--subtle); }
+.goal-chart-fill { height: 100%; border-radius: inherit; background: linear-gradient(to right, var(--accent) 0 var(--earned), var(--success) var(--earned) var(--possible), var(--subtle) var(--possible) 100%); }
+.goal-chart-target { position: absolute; top: -.42rem; left: clamp(5px, var(--target), calc(100% - 5px)); width: 3px; height: 2.1rem; border-radius: 3px; background: var(--ink); box-shadow: 0 0 0 2px var(--surface); }
+.goal-legend { display: flex; flex-wrap: wrap; gap: .35rem .75rem; color: var(--muted); font-size: .78rem; }
+.goal-legend span { display: inline-flex; align-items: center; gap: .28rem; }
+.goal-legend i { width: .65rem; height: .65rem; border-radius: .2rem; background: var(--subtle); }
+.goal-legend .earned { background: var(--accent); }
+.goal-legend .available { background: var(--success); }
+.goal-answer + .goal-next { margin: -.3rem 0 .8rem; color: var(--muted); font-size: .9rem; }
+.goal-planner .quiet-action { margin-bottom: .7rem; }
 .goal-answer { margin: .8rem 0; min-height: 3.5rem; padding: .8rem; border-radius: .65rem; background: var(--surface); font-weight: 650; }
 .goal-planner .meta { line-height: 1.35; }
 .deadline { font-weight: 650; }

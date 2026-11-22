@@ -37,7 +37,8 @@
 .time { font-weight: 650; font-variant-numeric: tabular-nums; }
 .result > div { color: var(--muted); }
 .academic .result { border-radius: .65rem; padding-inline: .7rem; background-clip: padding-box; }
-.academic .result:hover { background: var(--subtle); }
+.academic .result:hover { background: transparent; }
+.academic .result:hover h3 a { color: var(--accent); }
 .goal-teaser { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; color: var(--ink); text-decoration: none; background: linear-gradient(110deg, var(--surface), var(--selected)); }
 .goal-teaser > span:nth-child(2) { flex: 1; }
 .goal-teaser small { display: block; color: var(--muted); }
