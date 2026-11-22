@@ -33,6 +33,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\dev.ps1
 
 ## Первый HTTPS-деплой на Linux
 
+Для краткосрочного конкурса подготовлен [пошаговый запуск на Amvera](docs/DEPLOY_AMVERA.md) с готовым `amvera.yml`. Общая инструкция ниже подходит другим Linux-хостингам.
+
 1. Подготовьте Python 3.12, постоянную PostgreSQL 16 и выделенный домен с TLS. Направьте трафик через прокси хостинга. Он должен сохранять исходный Host, заменять входящий X-Forwarded-Proto фактической схемой и быть единственной точкой доступа к Gunicorn.
 2. В панели хостинга задайте переменные для сборки, миграций и процесса приложения. Имена перечислены в [.env.example](.env.example). Django читает переменные процесса. Укажите `DJANGO_SETTINGS_MODULE=config.settings.production`, точные домены через запятую в `DJANGO_ALLOWED_HOSTS` и постоянный случайный `DJANGO_SECRET_KEY`. Ключ можно получить в приватной консоли командой `python -c "import secrets; print(secrets.token_urlsafe(64))"`.
 3. Задайте `PGDATABASE`, `PGUSER`, `PGPASSWORD`, `PGHOST` по данным хостинга. Порт PostgreSQL по умолчанию 5432. По умолчанию соединение требует TLS. Если провайдер выдаёт корневой сертификат, установите его для libpq и задайте `PGSSLMODE=verify-full`. Переменная `PORT` задаёт внутренний порт приложения.
