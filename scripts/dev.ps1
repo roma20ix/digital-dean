@@ -24,9 +24,9 @@ try {
     $studentA = $localSettings['DEMO_STUDENT_A_PASSWORD']
     $studentB = $localSettings['DEMO_STUDENT_B_PASSWORD']
     if (!$studentA -or !$studentB) {
-        throw 'Укажите разные DEMO_STUDENT_A_PASSWORD и DEMO_STUDENT_B_PASSWORD в .env или .env.local.'
+        throw 'Set distinct DEMO_STUDENT_A_PASSWORD and DEMO_STUDENT_B_PASSWORD in .env or .env.local.'
     }
-    if ($studentA -eq $studentB) { throw 'Пароли двух студентов должны различаться.' }
+    if ($studentA -eq $studentB) { throw 'The two student passwords must differ.' }
 
     $env:DJANGO_SETTINGS_MODULE = 'config.settings.local'
     $env:DEMO_STUDENT_A_PASSWORD = $studentA
@@ -40,7 +40,7 @@ try {
     $python = Join-Path $projectRoot '.venv\Scripts\python.exe'
     if (!(Test-Path $python)) {
         py -3.12 -m venv .venv
-        if ($LASTEXITCODE -ne 0) { throw 'Не удалось создать окружение. Установите Python 3.12 с Python Launcher.' }
+        if ($LASTEXITCODE -ne 0) { throw 'Could not create .venv. Install Python 3.12 with Python Launcher.' }
     }
 
     $requirements = Join-Path $projectRoot 'requirements.txt'
@@ -48,17 +48,17 @@ try {
     $checksum = (Get-FileHash $requirements -Algorithm SHA256).Hash
     if (!(Test-Path $stamp) -or (Get-Content $stamp -Raw).Trim() -ne $checksum) {
         & $python -m pip install -r $requirements
-        if ($LASTEXITCODE -ne 0) { throw 'Установка зависимостей завершилась с ошибкой.' }
+        if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
         Set-Content $stamp $checksum -Encoding ASCII
     }
 
     & $python manage.py migrate --noinput
-    if ($LASTEXITCODE -ne 0) { throw 'Миграции не применились.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Database migration failed.' }
     & $python manage.py seed_demo
-    if ($LASTEXITCODE -ne 0) { throw 'Не удалось подготовить демоаккаунты.' }
+    if ($LASTEXITCODE -ne 0) { throw 'Demo account setup failed.' }
 
     if (!$NoServer) {
-        Write-Host "Откройте http://127.0.0.1:$Port/login/"
+        Write-Host "Open http://127.0.0.1:$Port/login/"
         & $python manage.py runserver "127.0.0.1:$Port"
     }
 } finally {
