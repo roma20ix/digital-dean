@@ -16,6 +16,7 @@
   <header class="mast">
     <a class="brand" href="{% url 'today' %}"><span class="brand-mark" aria-hidden="true"></span>Цифровой деканат</a>
     <div class="tools">
+      <button class="snow-toggle" type="button" aria-pressed="false" aria-label="Включить снег" title="Включить снег" hidden><span aria-hidden="true">❄</span><i aria-hidden="true"></i></button>
       <div class="theme-picker" hidden>
         <button class="theme-trigger" type="button" popovertarget="theme-options" aria-label="Тема оформления">{% include "components/icon.html" with name="theme" %}<span>Как в системе</span></button>
         <div id="theme-options" popover aria-label="Выбор темы">

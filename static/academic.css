@@ -76,6 +76,14 @@
 .week-heading a { display: block; padding: .2rem .35rem; text-decoration: none; }
 .week-grid .axis { grid-column: 1; position: sticky; left: 0; font-variant-numeric: tabular-nums; z-index: 1; }
 .week-grid .period { display: block; min-width: 0; margin: .25rem; padding: .6rem; border: 0; border-radius: .65rem; background: var(--selected); font-size: .82rem; }
+.period.lesson-blue { --lesson-bg: light-dark(#edf4ff, #263b4b); --lesson-edge: light-dark(#9bc4f5, #6bafdb); }
+.period.lesson-green { --lesson-bg: light-dark(#e9f6ee, #294239); --lesson-edge: light-dark(#80c9a0, #73c99a); }
+.period.lesson-amber { --lesson-bg: light-dark(#fff3e4, #453a2b); --lesson-edge: light-dark(#e4bb79, #e2b574); }
+.period.lesson-rose { --lesson-bg: light-dark(#fbeef3, #44313d); --lesson-edge: light-dark(#dda4bf, #d895b3); }
+.period.lesson-changed { --lesson-bg: light-dark(#e6f6f2, #234a44); --lesson-edge: light-dark(#43ac91, #6ee0bd); }
+.day .period { background: var(--lesson-bg); border-left: .2rem solid var(--lesson-edge); border-radius: .55rem; padding: .75rem; margin-block: .45rem; }
+.week-grid .period { background: var(--lesson-bg); border: 1px solid var(--lesson-edge); border-left-width: .2rem; margin: .25rem; padding: .6rem; }
+.day .period.lesson-changed { box-shadow: inset 0 0 0 1px var(--lesson-edge); }
 .week-grid .period h3, .week-grid .time { font-size: .85rem; }
 .week-grid .day > p { margin: .4rem; color: var(--muted); font-size: .78rem; }
 .calendar-caption { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: baseline; }

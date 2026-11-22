@@ -34,6 +34,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-mark::before, .brand-mark::after { content: ""; position: absolute; width: 8px; height: 15px; top: 9px; background: var(--on-action); border-radius: 2px; transform: skewY(20deg); left: 7px; }
 .brand-mark::after { left: 17px; transform: skewY(-20deg); opacity: .75; }
 .tools { gap: .5rem; }
+.snow-toggle { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.5rem; padding: .35rem .55rem; border: 1px solid var(--line); border-radius: .75rem; color: var(--muted); background: var(--surface); }
+.snow-toggle[aria-pressed="true"] { color: var(--accent); background: var(--selected); }
+.snow-toggle i { display: block; width: 1.45rem; height: .84rem; border-radius: 1rem; background: var(--line); position: relative; transition: background .25s; }
+.snow-toggle i::after { content: ""; position: absolute; top: .13rem; left: .14rem; width: .58rem; height: .58rem; background: var(--surface); border-radius: 50%; transition: transform .25s; }
+.snow-toggle[aria-pressed="true"] i { background: var(--accent); }
+.snow-toggle[aria-pressed="true"] i::after { transform: translateX(.58rem); }
+.snow-layer { position: fixed; inset: 0; z-index: 5; overflow: hidden; pointer-events: none; }
+.snowflake { position: absolute; top: -1rem; left: var(--x); width: var(--size); aspect-ratio: 1; border-radius: 50%; background: #b7d8f1; opacity: .65; animation: snowfall var(--duration) linear var(--delay) infinite; }
+@keyframes snowfall { to { transform: translate3d(var(--drift), 105vh, 0); } }
+@media (prefers-reduced-motion: reduce) { .snow-layer { display: none; } }
 .theme, summary { color: var(--ink); background: var(--subtle); border-radius: .65rem; min-height: 2.6rem; }
 .theme { position: relative; margin: 0; }
 .theme .icon { position: absolute; left: .7rem; pointer-events: none; }
@@ -161,6 +171,11 @@ textarea { min-height: 7rem; resize: vertical; }
 .drawer[open] { display: flex; flex-direction: column; overflow: hidden; }
 .drawer::backdrop { background: #1815243d; }
 @media (prefers-reduced-motion: no-preference) {
+  :root { interpolate-size: allow-keywords; }
+  details::details-content { block-size: 0; overflow: hidden; opacity: 0; transition: block-size .28s ease, opacity .22s ease, content-visibility .28s allow-discrete; }
+  details[open]::details-content { block-size: auto; opacity: 1; }
+  details summary .icon { transition: transform .25s ease; }
+  details[open] summary .icon { transform: rotate(180deg); }
   .drawer[open] { animation: unfold .16s ease-out; }
 }
 .drawer-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .85rem 1rem; }

@@ -1,4 +1,37 @@
 const week = document.querySelector(".week-grid");
+const snowToggle = document.querySelector(".snow-toggle");
+if (snowToggle) {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let enabled = false;
+  try { enabled = localStorage.getItem("dean-snow") === "on"; } catch {}
+  let layer;
+  const renderSnow = () => {
+    snowToggle.hidden = false;
+    snowToggle.setAttribute("aria-pressed", String(enabled));
+    snowToggle.setAttribute("aria-label", enabled ? "Выключить снег" : "Включить снег");
+    snowToggle.title = enabled ? "Выключить снег" : "Включить снег";
+    layer?.remove();
+    layer = null;
+    if (!enabled || reduced.matches) return;
+    layer = document.createElement("div");
+    layer.className = "snow-layer";
+    layer.setAttribute("aria-hidden", "true");
+    for (let i = 0; i < 28; i++) {
+      const flake = document.createElement("span");
+      flake.className = "snowflake";
+      flake.style.cssText = `--x:${(i * 37) % 100}%;--size:${2 + (i % 4)}px;--duration:${9 + (i % 7)}s;--delay:-${(i * 13) % 17}s;--drift:${(i % 2 ? 1 : -1) * (12 + i)}px`;
+      layer.append(flake);
+    }
+    document.body.append(layer);
+  };
+  snowToggle.addEventListener("click", () => {
+    enabled = !enabled;
+    try { localStorage.setItem("dean-snow", enabled ? "on" : "off"); } catch {}
+    renderSnow();
+  });
+  reduced.addEventListener("change", renderSnow);
+  renderSnow();
+}
 if (week) {
   // Give matching start times a shared row, including mixed-duration classes.
   const periods = Array.from(week.querySelectorAll(".period"));
