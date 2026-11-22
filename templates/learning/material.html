@@ -1,0 +1,8 @@
+{% extends "learning/base.html" %}
+{% block title %}{{ week.title }}{% endblock %}
+{% block learning_content %}
+<a class="back" href="{% url 'course_detail' course.pk %}#week-{{ week.pk }}">← {{ course.title }}</a>
+<p class="meta">Материалы · Неделя {{ week.number }}</p>
+<h1>{{ week.title }}</h1>
+<article class="panel prose">{{ week.material|default:"Материал пока не опубликован."|linebreaks }}</article>
+{% endblock %}

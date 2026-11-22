@@ -1,0 +1,43 @@
+{% extends "learning/base.html" %}
+{% block title %}{{ task.notice.title }}{% endblock %}
+{% block learning_content %}
+<a class="back" href="{% url 'course_detail' course.pk %}#week-{{ task.week_id }}">← {{ course.title }}</a>
+<p class="meta">{{ task.get_kind_display }} · Неделя {{ task.week.number }}</p>
+<h1>{{ task.notice.title }}</h1>
+{% if error %}<p class="errorlist" role="alert">{{ error }}</p>{% endif %}
+<div class="course-layout"><div>
+  <section class="panel prose">
+    <span class="work-status {{ task.status }}">{{ task.get_status_display }}</span>
+    <h2>Условие задания</h2><p>{{ task.instructions|linebreaksbr }}</p>
+    <a href="{% url 'course_material' task.week_id %}">Материал недели</a>
+  </section>
+  <section class="panel">
+    {% if task.is_open %}
+      {% if task.status == "assigned" %}<form method="post" class="begin">{% csrf_token %}<button class="secondary" name="action" value="start">Начать работу</button></form>{% endif %}
+      <form method="post" class="stack">{% csrf_token %}{{ answer_form.as_div }}
+        <div class="actions"><button class="primary" name="action" value="submit">Отправить на проверку</button>
+          <button class="secondary" name="action" value="save">Сохранить черновик</button></div>
+      </form>
+    {% else %}
+      <h2>Ваше решение</h2><p>{{ task.answer|linebreaksbr }}</p>
+      <p class="meta">Отправлено {{ task.submitted_at|date:"j E, H:i" }}</p>
+    {% endif %}
+  </section>
+  <section class="panel"><h2>Оцените материал</h2>
+    {% if task.rating %}<p>Ваша оценка — {{ task.rating }} из 5.</p>{% endif %}
+    <form class="rating actions" method="post">{% csrf_token %}{{ rating_form.as_div }}
+      <button class="secondary" name="action" value="rate">Сохранить оценку</button></form>
+  </section>
+</div><aside class="course-side">
+  <section class="panel"><h2>Срок сдачи</h2><p class="deadline">{{ task.notice.due_at|date:"j E Y, H:i" }} МСК</p>
+    {% if task.extended %}<p>Срок перенесён на один день.</p>{% endif %}
+    {% if task.is_open and task.notice.due_at < now %}<p>Срок прошёл. Решение ещё можно отправить.</p>{% endif %}
+    {% if task.is_open and not task.extended and task.notice.due_at > now and student.late_days %}
+    <form method="post">{% csrf_token %}<button class="secondary" name="action" value="extend">Перенести на один день</button></form>{% endif %}
+    <small>Дней переноса осталось у вас: {{ student.late_days }}</small>
+  </section>
+  <section class="panel"><h2>Баллы за работу</h2><p class="points"><strong>{{ task.score|default_if_none:"—" }}</strong> из {{ task.max_score }}</p>
+    <a href="{% url 'study' %}#course-{{ course.pk }}">Ведомость курса →</a>
+  </section>
+</aside></div>
+{% endblock %}

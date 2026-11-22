@@ -1,0 +1,53 @@
+{% extends "learning/base.html" %}
+{% load static %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block learning_content %}
+<a class="back" href="{% url 'course_catalog' %}">← Все курсы</a>
+<p class="meta">{{ course.student.group_name }} · {{ course.assessment_type }}</p>
+<h1>{{ course.title }}</h1>
+<div class="course-layout">
+  <div>
+    <nav class="pills" aria-label="Содержание курса">
+      <a href="{% url 'course_detail' course.pk %}" {% if tab != "recordings" %}aria-current="page"{% endif %}>Курс</a>
+      <a href="?tab=recordings" {% if tab == "recordings" %}aria-current="page"{% endif %}>Видеозаписи</a>
+    </nav>
+    {% if tab == "recordings" %}
+    <section class="panel"><h2>Видеозаписи занятий</h2>
+      {% for week in recordings %}<article class="unit"><h3>{{ week.title }}</h3>
+        <video controls playsinline preload="metadata" aria-label="{{ week.title }}" src="{% static week.recording %}"></video>
+        <a href="{% url 'course_material' week.pk %}">Текстовый разбор</a></article>
+      {% empty %}<p>Записи занятий пока не опубликованы.</p>{% endfor %}
+    </section>
+    {% else %}
+    <section class="panel"><h2>Темы курса</h2>
+      {% for week in weeks %}<details class="unit" id="week-{{ week.pk }}">
+        <summary><small>Неделя {{ week.number }}</small>{{ week.title }}</summary>
+        <div class="week-links">
+          {% if week.material %}<a href="{% url 'course_material' week.pk %}">Материалы недели {{ week.number }}</a>{% endif %}
+          {% for task in week.tasks.all %}<a href="{{ task.detail_url }}">{{ task.notice.title }} <small>{{ task.get_status_display }}</small></a>{% endfor %}
+        </div>
+      </details>{% empty %}<p>Темы курса пока не опубликованы.</p>{% endfor %}
+    </section>
+    {% endif %}
+    <details class="panel syllabus" id="syllabus"><summary>Силлабус</summary>
+      <p>{{ course.syllabus|default:"Программа курса пока не опубликована." }}</p>
+    </details>
+  </div>
+  <aside class="course-side" aria-label="Сведения о курсе">
+    <section class="panel"><h2>Прогресс по курсу</h2>
+      {% if maximum %}<p class="points"><strong>{{ scaled|floatformat:"-2" }}</strong> из 10</p>
+      <progress value="{{ points }}" max="{{ maximum }}" aria-label="Набрано баллов"></progress>
+      <p class="meta">Накоплено {{ points }} из {{ maximum }} баллов. Ещё можно набрать до {{ remaining }}.</p>
+      {% else %}<p class="meta">Заданий с баллами пока нет.</p>{% endif %}
+      <a href="{% url 'study' %}#course-{{ course.pk }}">Смотреть ведомость →</a>
+    </section>
+    <section class="panel"><h2>Ближайший дедлайн</h2>
+      {% if nearest %}<p class="deadline">{{ nearest.notice.due_at|date:"j E, H:i" }}</p><small>До сдачи — {{ nearest.notice.due_at|timeuntil:now }}</small>
+      <a href="{{ nearest.detail_url }}">{{ nearest.notice.title }}</a>
+      {% else %}<p>Предстоящих сроков по курсу нет.</p>{% endif %}
+    </section>
+    <section class="panel course-support"><a href="{% url 'course_chat' course.pk %}">Чат курса →</a>
+      <a href="{% url 'request_new' %}?kind=appeal">Помощь в учёбе · написать в деканат</a></section>
+  </aside>
+</div>
+{% endblock %}

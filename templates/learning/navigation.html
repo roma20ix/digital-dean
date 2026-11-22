@@ -1,0 +1,7 @@
+{% with page=request.resolver_match.url_name %}
+<nav class="learning-nav" aria-label="Учебные разделы">
+  <a href="{% url 'course_catalog' %}" {% if page == "course_catalog" or page == "course_detail" or page == "course_material" or page == "course_chat" %}aria-current="location"{% endif %}>Мои курсы</a>
+  <a href="{% url 'task_list' %}" {% if page == "task_list" or page == "task_detail" %}aria-current="location"{% endif %}>Мои задания</a>
+  <a href="{% url 'study' %}" {% if page == "study" %}aria-current="page"{% endif %}>Ведомость</a>
+</nav>
+{% endwith %}

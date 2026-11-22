@@ -1,15 +1,14 @@
-{% extends "base.html" %}
+{% extends "learning/base.html" %}
 {% load static %}
-{% block styles %}<link rel="stylesheet" href="{% static 'academic.css' %}">{% endblock %}
 {% block title %}Учёба{% endblock %}
-{% block content %}
+{% block learning_content %}
 <div class="academic">
   <h1>Учёба</h1>
   <section class="panel">
     <h2 class="section-heading">{% include "components/icon.html" with name="study" %}Оценки и зачёты</h2>
     {% for course in courses %}
-      <div class="result">
-        <h3>{{ course.title }}</h3>
+      <div class="result" {% if course.pk %}id="course-{{ course.pk }}"{% endif %}>
+        <h3>{% if course.pk %}<a href="{% url 'course_detail' course.pk %}">{{ course.title }}</a>{% else %}{{ course.title }}{% endif %}</h3>
         <div><span class="grade{% if course.grade == 2 %} low{% elif course.grade != None or course.credit_label == 'Зачтено' %} passed{% endif %}">{% if course.grade != None %}
           <strong>{{ course.grade }}</strong>{% if course.grade == 2 %} · Неудовлетворительно{% endif %}
         {% elif course.assessment_type == "Зачёт" %}{{ course.credit_label }}

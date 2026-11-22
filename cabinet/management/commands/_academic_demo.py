@@ -3,6 +3,7 @@ from datetime import date, datetime, time, timedelta
 from django.utils import timezone
 
 from cabinet.models import Attendance, CourseResult, Exam, Lesson, Notice
+from ._learning_demo import seed_learning
 
 
 # Фиксированные даты показа сохраняют адреса занятий после повторного seed_demo.
@@ -102,3 +103,5 @@ def seed_academics(student, employee=None):
             recipient=student, category=category, headline=headline, created_at=published,
             defaults={"text": body, "source": "Деканат", "due_at": due_at},
         )
+
+    seed_learning(student, subject, pending, credit, workshops, task, published, at)

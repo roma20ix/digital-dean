@@ -1,0 +1,33 @@
+{% extends "learning/base.html" %}
+{% block title %}Мои задания{% endblock %}
+{% block learning_content %}
+<h1>Мои задания</h1>
+{% if student %}<p class="byline">Дни для переноса срока сдачи · {{ student.late_days }}</p>{% endif %}
+<form class="task-filters panel" method="get" aria-label="Фильтр заданий">
+  <details><summary>Курсы</summary><fieldset><legend class="visually-hidden">Выбор курсов</legend>
+    {% for key, title, selected in course_choices %}
+    <label><input type="checkbox" name="course" value="{{ key }}" {% if selected %}checked{% endif %}>{{ title }}</label>
+    {% empty %}<p>Курсов пока нет.</p>{% endfor %}
+  </fieldset></details>
+  <details><summary>Статусы</summary><fieldset><legend class="visually-hidden">Выбор статусов</legend>
+    {% for key, label in statuses %}
+    <label><input type="checkbox" name="status" value="{{ key }}" {% if key in selected_statuses %}checked{% endif %}>{{ label }}</label>
+    {% endfor %}
+  </fieldset></details>
+  <div class="actions"><button class="secondary">Применить</button>{% if filtered %}<a href="{% url 'task_list' %}">Сбросить фильтры</a>{% endif %}</div>
+  {% if filtered %}<div class="filter-values" aria-label="Применённые фильтры">
+    {% for key, title, selected in course_choices %}{% if selected %}<span>{{ title }}</span>{% endif %}{% endfor %}
+    {% for key, label in statuses %}{% if key in selected_statuses %}<span>{{ label }}</span>{% endif %}{% endfor %}
+  </div>{% endif %}
+</form>
+{% for label, rows in groups.items %}
+<section class="panel task-group"><h2>{{ label }} <small>{{ rows|length }}</small></h2>
+  {% for task in rows %}<article class="task-row">
+    <div><h3><a href="{{ task.detail_url }}">{{ task.notice.title }}</a></h3><small>{{ task.week.course.title }}</small></div>
+    <span class="work-status {{ task.status }}">{{ task.get_status_display }}</span>
+    <span>{{ task.score|default_if_none:"—" }}/{{ task.max_score }}</span>
+    <span>{% if task.is_open and task.notice.due_at < now %}<small class="overdue">Срок прошёл</small>{% endif %}{{ task.notice.due_at|date:"j E, H:i" }}</span>
+  </article>{% endfor %}
+</section>
+{% empty %}<section class="panel"><p>{% if filtered %}По выбранным фильтрам заданий нет.{% else %}Вам пока не назначили заданий.{% endif %}</p></section>{% endfor %}
+{% endblock %}

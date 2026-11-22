@@ -11,6 +11,7 @@ class StudentProfile(models.Model):
     program = models.CharField(max_length=200)
     year = models.PositiveSmallIntegerField()
     group_name = models.CharField(max_length=40)
+    late_days = models.PositiveSmallIntegerField(default=3)
     is_demo = models.BooleanField(default=False)
 
 
@@ -91,6 +92,15 @@ class Lesson(models.Model):
 
 
 class CourseResult(models.Model):
+    class Category(models.TextChoices):
+        REQUIRED = "required", "Обязательные"
+        ELECTIVE = "elective", "Факультативные"
+        AUDIT = "audit", "Вольнослушатель"
+        INTERNAL = "internal", "Внутренние"
+
+    category = models.CharField(max_length=12, choices=Category.choices, default=Category.REQUIRED)
+    syllabus = models.TextField(blank=True)
+
     class Assessment(models.TextChoices):
         EXAM = "Экзамен"
         CREDIT = "Зачёт"
@@ -176,7 +186,8 @@ class Notice(models.Model):
     def target_url(self):
         if self.lesson_id:
             return self.lesson.detail_url
-        return reverse("inbox")
+        work = getattr(self, "work", None)
+        return work.detail_url if work else reverse("inbox")
 
 
 class Attendance(models.Model):
@@ -186,3 +197,70 @@ class Attendance(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["student", "lesson"], name="student_lesson_attendance")]
+
+
+class CourseWeek(models.Model):
+    course = models.ForeignKey(CourseResult, on_delete=models.CASCADE, related_name="weeks")
+    number = models.PositiveSmallIntegerField()
+    title = models.CharField(max_length=200)
+    material = models.TextField(blank=True)
+    recording = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        ordering = ["number"]
+        constraints = [models.UniqueConstraint(fields=["course", "number"], name="course_week_number")]
+
+
+class CourseTask(models.Model):
+    class Kind(models.TextChoices):
+        HOMEWORK = "homework", "Домашнее задание"
+        EXAM_REGISTRATION = "exam_signup", "Запись на экзамен"
+
+    class Status(models.TextChoices):
+        ASSIGNED = "assigned", "Задано"
+        STARTED = "started", "В работе"
+        DRAFT = "draft", "Решение прикреплено"
+        REVIEW = "review", "На проверке"
+        GRADED = "graded", "Оценено"
+
+    OPEN = (Status.ASSIGNED, Status.STARTED, Status.DRAFT)
+    week = models.ForeignKey(CourseWeek, on_delete=models.CASCADE, related_name="tasks")
+    notice = models.OneToOneField(Notice, on_delete=models.CASCADE, related_name="work")
+    kind = models.CharField(max_length=16, choices=Kind.choices, default=Kind.HOMEWORK)
+    instructions = models.TextField()
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.ASSIGNED)
+    answer = models.TextField(blank=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    score = models.PositiveSmallIntegerField(null=True, blank=True)
+    max_score = models.PositiveSmallIntegerField(default=10)
+    extended = models.BooleanField(default=False)
+    rating = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(condition=models.Q(max_score__gt=0), name="positive_task_max"),
+            models.CheckConstraint(condition=models.Q(score__lte=models.F("max_score")), name="valid_task_score"),
+            models.CheckConstraint(condition=models.Q(rating__range=(1, 5)), name="valid_task_rating"),
+            models.CheckConstraint(condition=(models.Q(status="graded", score__isnull=False)
+                                   | (~models.Q(status="graded") & models.Q(score__isnull=True))),
+                                   name="graded_task_has_score"),
+        ]
+
+    @property
+    def detail_url(self):
+        return reverse("task_detail", args=[self.pk])
+
+    @property
+    def is_open(self):
+        return self.status in self.OPEN
+
+
+class CourseMessage(models.Model):
+    author = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    group_name = models.CharField(max_length=40)
+    course_title = models.CharField(max_length=200)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "pk"]

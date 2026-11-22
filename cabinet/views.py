@@ -11,7 +11,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from .forms import AppearanceForm, RequestForm
-from .models import Appearance, EmployeeProfile, Attendance, CourseResult, Exam, Lesson, Notice, StudentProfile, StudentRequest
+from .models import (Appearance, Attendance, CourseResult, CourseTask, EmployeeProfile, Exam, Lesson, Notice,
+                     StudentProfile, StudentRequest)
 
 
 @login_not_required
@@ -45,8 +46,10 @@ def student_only(view):
 def student_notices(user, now):
     return Notice.objects.filter(
         Q(lesson__isnull=True) | Q(lesson__group_name=F("recipient__group_name")),
+        Q(work__isnull=True) | Q(work__week__course__student_id=F("recipient_id"),
+                                 category=Notice.Category.DEADLINE, due_at__isnull=False),
         recipient__user=user, created_at__lte=now,
-    ).select_related("lesson")
+    ).select_related("lesson", "work")
 
 
 @never_cache
@@ -61,11 +64,16 @@ def today(request):
     lessons = student_lessons(request.user)
     local_day = timezone.localdate(now)
     start = timezone.make_aware(datetime.combine(local_day, time.min))
+    next_deadline = (
+        notices.filter(Q(work__isnull=True) | Q(work__status__in=CourseTask.OPEN),
+                       category=Notice.Category.DEADLINE, due_at__gte=now)
+        .select_related("work__week__course").order_by("due_at", "pk").first()
+    )
     return render(request, "today.html", {
         "today_lessons": lessons.filter(starts_at__gte=start, starts_at__lt=start + timedelta(days=1)),
         "student": student_context(request.user),
         "next_lesson": lessons.filter(ends_at__gt=now).first(),
-        "next_deadline": notices.filter(category=Notice.Category.DEADLINE, due_at__gte=now).order_by("due_at", "pk").first(),
+        "next_deadline": next_deadline,
         "latest_request": StudentRequest.objects.filter(owner=request.user).first(),
         "changes": notices.filter(category=Notice.Category.CHANGE),
     })
@@ -161,7 +169,8 @@ def requests(request):
 @require_http_methods(["GET", "POST"])
 @student_only
 def request_new(request):
-    form = RequestForm(request.POST if request.method == "POST" else None, user=request.user)
+    initial = {"kind": StudentRequest.Kind.APPEAL} if request.GET.get("kind") == "appeal" else {}
+    form = RequestForm(request.POST if request.method == "POST" else None, user=request.user, initial=initial)
     if form.is_bound and form.is_valid():
         data = form.cleaned_data
         item, _ = StudentRequest.objects.get_or_create(

@@ -2,7 +2,7 @@
 <nav aria-label="Разделы кабинета">
   <a href="{% url 'today' %}" {% if page == "today" %}aria-current="page"{% endif %} title="Сегодня" aria-label="Сегодня">{% include "components/icon.html" with name="today" %}<span>Сегодня</span></a>
   <a href="{% url 'schedule' %}" {% if page == "schedule" %}aria-current="page"{% endif %} title="Расписание" aria-label="Расписание">{% include "components/icon.html" with name="schedule" %}<span>Расписание</span></a>
-  {% if not employee_account %}<a href="{% url 'study' %}" {% if page == "study" %}aria-current="page"{% endif %} title="Учёба" aria-label="Учёба">{% include "components/icon.html" with name="study" %}<span>Учёба</span></a>{% endif %}
+  {% if not employee_account %}<a href="{% url 'course_catalog' %}" {% if request.path|slice:":7" == "/study/" %}aria-current="location"{% endif %} title="Учёба" aria-label="Учёба">{% include "components/icon.html" with name="study" %}<span>Учёба</span></a>{% endif %}
   {% if not employee_account %}<a href="{% url 'requests' %}" {% if page == "requests" or page == "request_detail" or page == "request_new" %}aria-current="location"{% endif %} title="Мои заявки" aria-label="Мои заявки">{% include "components/icon.html" with name="requests" %}<span>Мои заявки</span></a>{% endif %}
   {% if not employee_account %}<a href="{% url 'inbox' %}" {% if page == "inbox" %}aria-current="page"{% endif %} title="Уведомления" aria-label="Уведомления">{% include "components/icon.html" with name="inbox" %}<span>Уведомления</span></a>{% endif %}
   <a href="{% url 'profile' %}" {% if page == "profile" %}aria-current="page"{% endif %} title="Профиль" aria-label="Профиль">{% include "components/icon.html" with name="profile" %}<span>Профиль</span></a>
