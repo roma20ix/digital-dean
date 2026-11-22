@@ -1,16 +1,16 @@
 :root {
   color-scheme: light dark;
   font: 100%/1.5 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --canvas: light-dark(#f6f6f8, #18181e);
-  --surface: light-dark(#fff, #222229);
-  --subtle: light-dark(#eeeef2, #2e2e37);
-  --ink: light-dark(#22222c, #f2f1f6);
-  --muted: light-dark(#626172, #bdbbcd);
-  --line: light-dark(#e2e1e8, #3c3a47);
-  --accent: light-dark(#5543a7, #c7b9ff);
-  --selected: light-dark(#edebfa, #362e50);
-  --action: light-dark(#5945ad, #c7b9ff);
-  --on-action: light-dark(white, #23193c);
+  --canvas: light-dark(#f6f6f8, #171b21);
+  --surface: light-dark(#fff, #20262d);
+  --subtle: light-dark(#eeeef2, #2b343d);
+  --ink: light-dark(#22222c, #f2f5f8);
+  --muted: light-dark(#626172, #bac6d0);
+  --line: light-dark(#e2e1e8, #394650);
+  --accent: light-dark(#5543a7, #8fc8fa);
+  --selected: light-dark(#edebfa, #263f52);
+  --action: light-dark(#5945ad, #80bbef);
+  --on-action: light-dark(white, #12232e);
   --success: light-dark(#17654e, #8ce4ba);
   --success-bg: light-dark(#e6f6ee, #1d3933);
   --error: light-dark(#a72c43, #ffa4b2);
@@ -21,6 +21,7 @@ body { margin: 0; overflow-wrap: anywhere; }
 button, input, select, textarea { font: inherit; }
 a { color: var(--ink); text-decoration-color: color-mix(in srgb, currentColor 48%, transparent); text-decoration-thickness: 1px; text-underline-offset: .22em; }
 a:hover { text-decoration-color: var(--accent); }
+a { text-decoration-thickness: .08em; text-decoration-skip-ink: auto; transition: text-decoration-color .22s ease, color .22s ease; }
 button, select, summary { cursor: pointer; }
 button, a { -webkit-tap-highlight-color: transparent; }
 [hidden] { display: none !important; }
@@ -136,6 +137,9 @@ textarea { min-height: 7rem; resize: vertical; }
 }
 #theme-options button:hover, .stack option:hover { background: var(--subtle); }
 #theme-options [aria-pressed=true], .stack option:checked { color: var(--accent); background: var(--selected); }
+.palette-options { border-top: 1px solid var(--line); margin-top: .35rem; padding-top: .4rem; }
+.palette-options > span { display: block; padding: .15rem .75rem; color: var(--muted); font-size: .8rem; }
+.palette-options [aria-pressed=true]::before { content: '✓ '; }
 @supports (appearance: base-select) {
   .stack select, .stack select::picker(select) { appearance: base-select; }
 }
@@ -193,6 +197,9 @@ textarea { min-height: 7rem; resize: vertical; }
 .avatar.portrait { width: 4rem; height: 4rem; flex: none; font-size: 1.25rem; }
 .personal-form { margin-top: 1rem; }
 .personal-form small { color: var(--muted); }
+.avatar-reset { margin-top: .9rem; }
+.avatar-reset button { padding: .55rem .8rem; border: 1px solid var(--line); border-radius: .6rem; color: var(--ink); background: var(--subtle); }
+.avatar-reset button:hover { background: var(--selected); }
 .personal-form .check { display: inline-flex; align-items: center; gap: .55rem; }
 .personal-form input[type="checkbox"] { width: auto; }
 .faculty-lesson { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(13rem,100%),1fr)); gap: .5rem; border-top: 1px solid var(--line); padding: .8rem 0; }
@@ -201,10 +208,14 @@ textarea { min-height: 7rem; resize: vertical; }
 .rail-toggle:hover { background: var(--subtle); }
 .rail a, .rail button { white-space: nowrap; overflow: hidden; }
 @media (min-width: 52.01rem) {
-  [data-rail="compact"] .shell:not(.guest) { grid-template-columns: 4.9rem minmax(0,1fr); }
+  [data-rail="compact"] .shell:not(.guest) { grid-template-columns: 3.8rem minmax(0,1fr); }
+  [data-rail="compact"] .rail { padding-inline: .4rem; }
+  [data-rail="compact"] .rail nav a, [data-rail="compact"] .rail .logout, [data-rail="compact"] .rail-toggle { justify-content: center; padding-inline: .2rem; }
   [data-rail="compact"] .rail span { display: none; }
   [data-rail="compact"] .rail-toggle .icon { transform: rotate(180deg); }
 }
+[data-palette="sage"] { --accent: light-dark(#5543a7, #a2dbb8); --selected: light-dark(#edebfa, #294339); --action: light-dark(#5945ad, #96d5ae); --on-action: light-dark(white, #172a20); }
+[data-palette="amber"] { --accent: light-dark(#5543a7, #f2c288); --selected: light-dark(#edebfa, #4a382d); --action: light-dark(#5945ad, #efb978); --on-action: light-dark(white, #312314); }
 @media (prefers-reduced-motion: no-preference) {
   .shell { transition: grid-template-columns .22s ease; }
   .rail-toggle .icon { transition: transform .22s ease; }

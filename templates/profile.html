@@ -28,9 +28,11 @@
     {% csrf_token %}
     <div>{{ appearance_form.photo.label_tag }}{{ appearance_form.photo }}
       <small>JPG, PNG или WebP до 4 МБ. Изображение будет обрезано по центру.</small>{{ appearance_form.photo.errors }}</div>
-    {% if has_avatar %}<label class="check">{{ appearance_form.remove }} Вернуть инициалы</label>{% endif %}
     <button class="primary">Сохранить изменения</button>
   </form>
+  {% if has_avatar %}<form method="post" action="{% url 'profile' %}" class="avatar-reset">
+    {% csrf_token %}<button type="submit" name="remove" value="on">Удалить аватарку и вернуть инициалы</button>
+  </form>{% endif %}
 </section>
 </div>
 {% endblock %}

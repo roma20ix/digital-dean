@@ -20,6 +20,7 @@
         <button class="theme-trigger" type="button" popovertarget="theme-options" aria-label="Тема оформления">{% include "components/icon.html" with name="theme" %}<span>Как в системе</span></button>
         <div id="theme-options" popover aria-label="Выбор темы">
           <button data-theme="system">Как в системе</button><button data-theme="light">Светлая</button><button data-theme="dark">Тёмная</button>
+          <div class="palette-options" aria-label="Палитра тёмной темы"><span>Акцент</span><button data-palette="ocean">Синий</button><button data-palette="sage">Шалфей</button><button data-palette="amber">Янтарь</button></div>
         </div>
       </div>
       {% if user.is_authenticated %}

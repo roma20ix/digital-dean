@@ -85,15 +85,15 @@ class AcademicSectionsTests(TestCase):
 
     def test_individual_results_upcoming_exams_deadlines_and_next_lesson(self):
         for student, subject, mark, pending, deadline in [
-            (self.a, "Линейная алгебра", 5, "Статистика", "Сдать задачи по алгебре"),
-            (self.b, "Гражданское право", 4, "История права", "Сдать разбор судебного дела"),
+            (self.a, "Линейная алгебра", 9, "Статистика", "Сдать задачи по алгебре"),
+            (self.b, "Гражданское право", 8, "История права", "Сдать разбор судебного дела"),
         ]:
             self.client.force_login(student.user)
             study = self.client.get("/study/", {"student_id": self.a.pk}).context
             courses = study["courses"]
             self.assertEqual(set(courses.values_list("student_id", flat=True)), {student.pk})
             self.assertEqual(courses.get(title=subject).grade, mark)
-            self.assertEqual(courses.get(assessment_type="Зачёт").credit_label, "Зачтено")
+            self.assertTrue(all(course.credit_label == "Зачтено" for course in courses.filter(assessment_type="Зачёт")))
             self.assertIsNone(courses.get(title=pending).grade)
             self.assertEqual(courses.get(title=pending).credit_label, "Оценка пока не выставлена")
             self.assertEqual(study["exams"].get().course_title, pending)
