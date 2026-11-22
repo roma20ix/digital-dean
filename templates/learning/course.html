@@ -35,13 +35,13 @@
     </details>
   </div>
   <aside class="course-side" aria-label="Сведения о курсе">
-    <section class="panel"><h2>Прогресс по курсу</h2>
-      {% if maximum %}<div class="course-progress" style="--rate: calc(100% * {{ points }} / {{ maximum }})"><span><strong>{{ scaled|floatformat:"-2" }}</strong><small>из 10</small></span></div>
-      <p class="meta">Накопленный результат по опубликованным заданиям</p>
+    <section class="panel"><h2>Баллы за задания</h2>
+      {% if maximum %}<div class="course-progress" style="--rate: calc(100% * {{ points }} / {{ maximum }})"><span><strong>{{ points }}</strong><small>из {{ maximum }} баллов</small></span></div>
+      <p class="meta">Это баллы за опубликованные задания. Оценка в ведомости выставляется отдельно.</p>
       <progress value="{{ points }}" max="{{ maximum }}" aria-label="Набрано баллов"></progress>
       <p class="meta">Накоплено {{ points }} из {{ maximum }} баллов. Ещё можно набрать до {{ remaining }}.</p>
       {% else %}<p class="meta">Заданий с баллами пока нет.</p>{% endif %}
-      <a href="{% url 'study' %}#course-{{ course.pk }}">Смотреть ведомость →</a>
+      <a href="{% url 'study' %}#course-{{ course.pk }}">Смотреть оценку в ведомости →</a>
     </section>
     {% if maximum %}<section class="panel goal-planner" id="goal-planner" data-points="{{ points }}" data-remaining="{{ remaining }}" data-maximum="{{ maximum }}">
       <p class="band">Что, если…</p><h2>План достижения цели</h2>
